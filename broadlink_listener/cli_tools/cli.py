@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Gabriele Pongelli
+#
+# SPDX-License-Identifier: MIT
+
 """Console script for broadlink_listener."""
 
 import click

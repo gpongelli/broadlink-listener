@@ -1,3 +1,7 @@
+REM SPDX-FileCopyrightText: 2022 Gabriele Pongelli
+REM
+REM SPDX-License-Identifier: MIT
+
 @ECHO OFF
 
 pushd %~dp0

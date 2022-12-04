@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Gabriele Pongelli
+#
+# SPDX-License-Identifier: MIT
+
 * Broadlink Listener version:
 * Python version:
 * Operating System:
