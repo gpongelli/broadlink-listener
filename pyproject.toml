@@ -1,0 +1,176 @@
+[tool.poetry]
+    name = "broadlink-listener"
+    version = "0.0.0"
+    homepage = "https://github.com/gpongelli/broadlink-listener"
+    description = "Broadlink IR codes listener and SmartIR json generator."
+    authors = ["Gabriele Pongelli <gabriele.pongelli@gmail.com>"]
+    readme = "README.md"
+    license =  "MIT"
+    classifiers=[
+        'Development Status :: 2 - Pre-Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+    ]
+    packages = [
+        { include = "broadlink_listener" },
+        { include = "tests", format = "sdist" },
+    ]
+
+    [tool.poetry.dependencies]
+        python = ">=3.9.0,<4.0"
+        click = "8.1.3"
+        tqdm = "^4.64.0"
+        cloup = "^2.0.0"
+        termcolor = "^2.1.1"
+        broadlink = "^0.18.3"
+
+
+    [tool.poetry.group.devel]
+        optional = true
+        [tool.poetry.group.devel.dependencies]
+            pip  = "^22.3.1"
+            black  = "^22.0"
+            isort  = "^5.8.0"
+            flake8  = "^3.9.2"
+            flake8-docstrings = "^1.6.0"
+            mypy = "^0.961"
+            pytest  = "^7.1.2"
+            pytest-cov  = "^3.0.0"
+            tox  = "^3.25.0"
+            virtualenv  = "^20.2.2"
+            twine  = "^3.3.0"
+            Sphinx = "4.2.0"
+            sphinx-rtd-theme = "1.0.0"
+            sphinxcontrib-napoleon = "0.7"
+            m2r2 = "0.3.2"
+            pre-commit = "^2.12.0"
+            pytomlpp = "^1.0.11"
+            commitizen = "^2.32.2"
+            darglint = "^1.8.1"
+            bandit = "^1.7.4"
+            yamllint = "^1.26.3"
+            codespell = "^2.1.0"
+            pylint = "^2.14.3"
+            types-termcolor = "^1.1.5"
+            types-setuptools = "^65.3.0"
+            reuse = "^1.1.0"
+
+
+[tool.poetry.scripts]
+        broadlink-listener = 'broadlink_listener.cli_tools.cli:main'
+
+[tool.black]
+    line-length = 120
+    skip-string-normalization = true
+    target-version = ['py39', 'py310']
+    include = '\.pyi?$'
+    exclude = '''
+    /(
+        \.eggs
+      | \.git
+      | \.hg
+      | \.mypy_cache
+      | \.tox
+      | \.venv
+      | _build
+      | buck-out
+      | build
+      | dist
+    )/
+    '''
+
+[tool.isort]
+    multi_line_output = 3
+    include_trailing_comma = true
+    force_grid_wrap = 0
+    use_parentheses = true
+    ensure_newline_before_comments = true
+    line_length = 120
+    skip_gitignore = true
+    # you can skip files as below
+    #skip_glob = ["docs/conf.py", "path/*"]
+
+[tool.commitizen]
+    name = "cz_conventional_commits"
+    version = "0.0.0"
+    version_files = [
+        "broadlink_listener/__init__.py:__version__",
+        "pyproject.toml:version"
+    ]
+    gpg_sign = true
+    bump_message = 'Bump version: $current_version -> $new_version'
+    update_changelog_on_bump = false
+    style = [
+        ["qmark", "fg:#ff9d00 bold"],
+        ["question", "bold"],
+        ["answer", "fg:#ff9d00 bold"],
+        ["pointer", "fg:#ff9d00 bold"],
+        ["highlighted", "fg:#ff9d00 bold"],
+        ["selected", "fg:#cc5454"],
+        ["separator", "fg:#cc5454"],
+        ["instruction", ""],
+        ["text", ""],
+        ["disabled", "fg:#858585 italic"]
+    ]
+
+
+[tool.bandit]
+    tests = [
+        # list from https://github.com/outscale/osc-sdk-python/blob/master/bandit.conf
+        "B101",  # assert_used
+        "B103",  # set_bad_file_permissions
+        "B105",  # hardcoded_password_string
+        "B106",  # hardcoded_password_funcarg
+        "B107",  # hardcoded_password_default
+        "B108",  # hardcoded_tmp_directory
+        "B110",  # try_except_pass
+        "B112",  # try_except_continue
+        "B108",  # hardcoded_tmp_directory
+        "B301",  # pickle library
+        "B303",  # MD5 insecure hash function
+        "B304",  # insecure ciphers
+        "B305",  # insecure cipher modes
+        "B306",  # deprecated mktemp
+        "B307",  # eval - Use of possibly insecure function - consider using safer ast.literal_eval
+        "B313",  # xml_bad_cElementTree
+        "B314",  # xml_bad_ElementTree
+        "B315",  # xml_bad_expatreader
+        "B316",  # xml_bad_expatbuilder
+        "B317",  # xml_bad_sax
+        "B318",  # xml_bad_minidom
+        "B319",  # xml_bad_pulldom
+        "B320",  # xml_bad_etree
+        "B323",  # unverified_context
+        "B324",  # hashlib_new_insecure_functions
+        "B325",  # tempnam
+        "B501",  # request_with_no_cert_validation
+        "B502",  # ssl_with_bad_version
+        "B503",  # ssl_with_bad_defaults
+        "B504",  # ssl_with_no_version
+        "B505",  # weak_cryptographic_key
+        "B506",  # yaml_load
+        "B507",  # ssh_no_host_key_verification
+        "B601",  # paramiko_calls
+        "B602",  # subprocess_popen_with_shell_equals_true
+        "B604",  # any_other_function_with_shell_equals_true
+        "B605",  # start_process_with_a_shell
+        "B606",  # start_process_with_no_shell
+        "B607",  # start_process_with_partial_path
+        "B608",  # hardcoded_sql_expressions
+        "B609"   # linux_commands_wildcard_injection
+    ]
+
+
+#[tool.pylint]
+#ignore-paths = [
+#    "folder/*"
+#]
+#max-line-length=120
+
+[build-system]
+    requires = ["poetry-core>=1.0.0"]
+    build-backend = "poetry.core.masonry.api"
