@@ -48,7 +48,7 @@ jobs:
           path: ./CHANGELOG.md
 
       # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#caching-packages
-      - uses: Install Poetry
+      - name: Install Poetry
         run: pipx install poetry
 
       # https://github.com/actions/setup-python
