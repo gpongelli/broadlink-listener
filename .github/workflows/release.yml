@@ -36,7 +36,7 @@ jobs:
         shell: bash
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # https://github.com/mindsers/changelog-reader-action
       - name: Get Changelog Entry
@@ -46,6 +46,10 @@ jobs:
           validation_depth: 10
           version: ${{ steps.tag_name.outputs.current_version }}
           path: ./CHANGELOG.md
+
+      # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#caching-packages
+      - uses: Install Poetry
+        run: pipx install poetry
 
       # https://github.com/actions/setup-python
       - uses: actions/setup-python@v4

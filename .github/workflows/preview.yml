@@ -25,7 +25,12 @@ jobs:
         python-versions: [ 3.8 ]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
+      # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#caching-packages
+      - uses: Install Poetry
+        run: pipx install poetry
+
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-versions }}
