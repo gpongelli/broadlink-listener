@@ -64,7 +64,7 @@
             reuse = "^1.1.0"
 
 
-[tool.poetry.scripts]
+    [tool.poetry.scripts]
         broadlink-listener = 'broadlink_listener.cli_tools.cli:main'
 
 [tool.black]
