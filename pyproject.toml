@@ -169,11 +169,11 @@
     ]
 
 
-#[tool.pylint]
+[tool.pylint]
 #ignore-paths = [
 #    "folder/*"
 #]
-#max-line-length=120
+max-line-length=120
 
 [build-system]
     requires = ["poetry-core>=1.0.0"]
