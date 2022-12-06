@@ -161,14 +161,12 @@ def _learn_single_code(device: Device) -> Optional[str]:
     while time.time() - start < DEFAULT_TIMEOUT:
         time.sleep(1)
         try:
-            data = device.check_data()
+            data: bytes = device.check_data()
         except (ReadError, StorageError):
             continue
         else:
-            _learnt = ''.join(format(x, '02x') for x in bytearray(data))
-            _decode_hex = codecs.getdecoder("hex_codec")
-            b64 = base64.b64encode(_decode_hex(_learnt)[0])
-            _ret = b64.decode('utf-8')
+            b64_data = binascii.b2a_base64(data, newline=False)
+            _ret = b64_data.decode('utf-8')
             break
 
     return _ret
