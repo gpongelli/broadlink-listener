@@ -4,8 +4,7 @@
 
 """Console script for broadlink_listener."""
 
-import base64
-import codecs
+import binascii
 import inspect
 import json
 import logging
@@ -14,7 +13,7 @@ import time
 import types
 from itertools import product
 from pathlib import Path
-from typing import cast
+from typing import Optional, cast
 
 import click
 from broadlink import Device, discover, gendevice
@@ -86,7 +85,7 @@ def discover_ir(local_ip: str):
                 f"Broadlink MAC Address: {''.join(format(x, '02x') for x in device.mac)}"
             )
         else:
-            logging.error("Error authenticating with device : %", device.host)
+            logging.error("Error authenticating with device : %s", device.host)
 
 
 @main.command(help="Generate SmartIR json file from input one")
@@ -98,7 +97,7 @@ def discover_ir(local_ip: str):
 @click.option('--no-swing-on-mode', '-s', type=str, multiple=True)
 def generate_smart_ir(
     json_file: Path, dev_type: str, ip_addr: str, mac_addr: str, no_temp_on_mode: tuple, no_swing_on_mode: tuple
-):
+):  # pylint: disable=too-many-arguments, too-many-locals
     """Generate SmartIR json file from input one.
 
     Arguments:
@@ -110,14 +109,17 @@ def generate_smart_ir(
                          selection
         no_swing_on_mode: option, that can be set multiple times, related to operating mode that have no swing
                           selection
+
+    Raises:
+        UsageError: raised if controller is not Broadlink or no IR signal is learnt during the process
     """
-    with open(str(json_file), "r") as in_file:
+    with open(str(json_file), "r", encoding='utf-8') as in_file:
         smartir_dict = json.load(in_file)
 
     try:
         if smartir_dict["supportedController"] != "Broadlink":
-            logging.error(f"Controller {smartir_dict['supportedController']} not supported")
-            raise Exception(f"Controller {smartir_dict['supportedController']} not supported")
+            logging.error("Controller %s not supported", smartir_dict['supportedController'])
+            raise click.exceptions.UsageError(f"Controller {smartir_dict['supportedController']} not supported")
 
         min_temp = int(smartir_dict["minTemperature"])
         max_temp = int(smartir_dict["maxTemperature"])
@@ -151,8 +153,8 @@ def _countdown():
         time.sleep(1)
 
 
-def _learn_single_code(device: Device):
-    print("Learning...")
+def _learn_single_code(device: Device) -> Optional[str]:
+    click.echo("Learning...")
     device.enter_learning()
     start = time.time()
     _ret = None

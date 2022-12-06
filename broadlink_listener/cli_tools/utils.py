@@ -30,14 +30,18 @@ def configure_logger(loglevel: str = 'info') -> None:
     )
 
 
-def get_local_ip_address():
-    """Returns local IP address for main interface."""
-    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-        s.settimeout(0)
+def get_local_ip_address() -> str:
+    """Returns local IP address for main interface.
+
+    Returns:
+        the local host's IP address configured
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as _sock:
+        _sock.settimeout(0)
         try:
             # doesn't even have to be reachable
-            s.connect(('10.254.254.254', 1))
-            _ip = s.getsockname()[0]
-        except (TimeoutError, InterruptedError, Exception):
+            _sock.connect(('10.254.254.254', 1))
+            _ip = _sock.getsockname()[0]
+        except (TimeoutError, InterruptedError, Exception):  # pylint: disable=broad-except
             _ip = '127.0.0.1'
     return _ip
