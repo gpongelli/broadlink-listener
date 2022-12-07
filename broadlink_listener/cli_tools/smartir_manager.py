@@ -55,16 +55,16 @@ class SmartIrManager:
 
         self.__all_combinations = tuple()
         try:
-            _controller = self.__smartir_dict[_DictKeys.CONTROLLER]
+            _controller = self.__smartir_dict[_DictKeys.CONTROLLER.value]
             if _controller != "Broadlink":
                 raise click.exceptions.UsageError(f"Controller {_controller} not supported")
 
-            self.__min_temp = int(self.__smartir_dict[_DictKeys.MIN_TEMP])
-            self.__max_temp = int(self.__smartir_dict[_DictKeys.MAX_TEMP])
-            self.__precision_temp = int(self.__smartir_dict.get(_DictKeys.PRECISION, 1))
-            self.__op_modes = self.__smartir_dict[_DictKeys.OPERATION_MODES]
-            self.__fan_modes = self.__smartir_dict.get(_DictKeys.FAN_MODES, None)
-            self.__swing_modes = self.__smartir_dict.get(_DictKeys.SWING_MODES, None)
+            self.__min_temp = int(self.__smartir_dict[_DictKeys.MIN_TEMP.value])
+            self.__max_temp = int(self.__smartir_dict[_DictKeys.MAX_TEMP.value])
+            self.__precision_temp = int(self.__smartir_dict.get(_DictKeys.PRECISION.value, 1))
+            self.__op_modes = self.__smartir_dict[_DictKeys.OPERATION_MODES.value]
+            self.__fan_modes = self.__smartir_dict.get(_DictKeys.FAN_MODES.value, None)
+            self.__swing_modes = self.__smartir_dict.get(_DictKeys.SWING_MODES.value, None)
 
         except KeyError as key_err:
             raise click.exceptions.UsageError(f"Missing mandatory field in json file: {key_err}") from None
@@ -86,10 +86,10 @@ class SmartIrManager:
                 range(self.__min_temp, self.__max_temp + 1, self.__precision_temp),
             )
             self.__combination_arguments = (
-                _DictKeys.OPERATION_MODES,
-                _DictKeys.FAN_MODES,
-                _DictKeys.SWING_MODES,
-                _DictKeys.TEMPERATURE,
+                _DictKeys.OPERATION_MODES.value,
+                _DictKeys.FAN_MODES.value,
+                _DictKeys.SWING_MODES.value,
+                _DictKeys.TEMPERATURE.value,
             )
         else:
             if any(_variable_args):
@@ -100,9 +100,9 @@ class SmartIrManager:
                         range(self.__min_temp, self.__max_temp + 1, self.__precision_temp),
                     )
                     self.__combination_arguments = (
-                        _DictKeys.OPERATION_MODES,
-                        _DictKeys.SWING_MODES,
-                        _DictKeys.TEMPERATURE,
+                        _DictKeys.OPERATION_MODES.value,
+                        _DictKeys.SWING_MODES.value,
+                        _DictKeys.TEMPERATURE.value,
                     )
                 else:
                     self.__all_combinations = product(
@@ -111,15 +111,15 @@ class SmartIrManager:
                         range(self.__min_temp, self.__max_temp + 1, self.__precision_temp),
                     )
                     self.__combination_arguments = (
-                        _DictKeys.OPERATION_MODES,
-                        _DictKeys.FAN_MODES,
-                        _DictKeys.TEMPERATURE,
+                        _DictKeys.OPERATION_MODES.value,
+                        _DictKeys.FAN_MODES.value,
+                        _DictKeys.TEMPERATURE.value,
                     )
             else:
                 self.__all_combinations = product(
                     self.__op_modes, range(self.__min_temp, self.__max_temp + 1, self.__precision_temp)
                 )
-                self.__combination_arguments = (_DictKeys.OPERATION_MODES, _DictKeys.TEMPERATURE)
+                self.__combination_arguments = (_DictKeys.OPERATION_MODES.value, _DictKeys.TEMPERATURE.value)
 
     @property
     def temperature(self) -> str:
@@ -165,14 +165,14 @@ class SmartIrManager:
         """Set value to output dict having previously set keys."""
         if _DictKeys.FAN_MODES in self.__combination_arguments:
             if _DictKeys.SWING_MODES in self.__combination_arguments:
-                self.__smartir_dict[_DictKeys.COMMANDS][self.operation_mode][self.fan_mode][self.swing_mode][self.temperature] = value
+                self.__smartir_dict[_DictKeys.COMMANDS.value][self.operation_mode][self.fan_mode][self.swing_mode][self.temperature] = value
             else:
-                self.__smartir_dict[_DictKeys.COMMANDS][self.operation_mode][self.fan_mode][self.temperature] = value
+                self.__smartir_dict[_DictKeys.COMMANDS.value][self.operation_mode][self.fan_mode][self.temperature] = value
         else:
             if _DictKeys.SWING_MODES in self.__combination_arguments:
-                self.__smartir_dict[_DictKeys.COMMANDS][self.operation_mode][self.swing_mode][self.temperature] = value
+                self.__smartir_dict[_DictKeys.COMMANDS.value][self.operation_mode][self.swing_mode][self.temperature] = value
             else:
-                self.__smartir_dict[_DictKeys.COMMANDS][self.operation_mode][self.temperature] = value
+                self.__smartir_dict[_DictKeys.COMMANDS.value][self.operation_mode][self.temperature] = value
 
     def save_dict(self):
         """Save modified dict to output json file."""
@@ -187,7 +187,7 @@ class SmartIrManager:
         _off = self.__broadlink_manager.learn_single_code()
         if not _off:
             raise click.exceptions.UsageError("No IR signal learnt for OFF command.")
-        self.__smartir_dict[_DictKeys.COMMANDS]["off"] = _off
+        self.__smartir_dict[_DictKeys.COMMANDS.value]["off"] = _off
 
     def lear_all(self):
         """Learn all the commands depending on calculated combination."""
