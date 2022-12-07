@@ -4,19 +4,16 @@
 
 """Console script for broadlink_listener."""
 
-import binascii
 import inspect
 import logging
 import sys
-import time
 import types
 from pathlib import Path
-from typing import Optional, cast
+from typing import cast
 
 import click
-from broadlink import Device, discover, gendevice
-from broadlink.const import DEFAULT_BCAST_ADDR, DEFAULT_PORT, DEFAULT_TIMEOUT
-from broadlink.exceptions import ReadError, StorageError
+from broadlink import discover
+from broadlink.const import DEFAULT_BCAST_ADDR, DEFAULT_TIMEOUT
 from cloup import HelpFormatter, HelpTheme, Style, group, option, option_group
 
 from broadlink_listener import __version__
@@ -109,12 +106,9 @@ def generate_smart_ir(
                          selection
         no_swing_on_mode: option, that can be set multiple times, related to operating mode that have no swing
                           selection
-
-    Raises:
-        UsageError: raised if controller is not Broadlink or no IR signal is learnt during the process
     """
     broadlink_mng = BroadlinkManager(dev_type, ip_addr, mac_addr)
-    smart_ir_mng = SmartIrManager(json_file, broadlink_mng)
+    smart_ir_mng = SmartIrManager(json_file, broadlink_mng, no_temp_on_mode, no_swing_on_mode)
 
     smart_ir_mng.learn_off()
     smart_ir_mng.lear_all()

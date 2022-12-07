@@ -4,17 +4,17 @@
 
 """Broadlink device manager."""
 
-import click
 import binascii
 import time
 from typing import Optional
 
+import click
 from broadlink import Device, gendevice
 from broadlink.const import DEFAULT_PORT, DEFAULT_TIMEOUT
 from broadlink.exceptions import ReadError, StorageError
 
 
-class BroadlinkManager:
+class BroadlinkManager:  # pylint: disable=too-few-public-methods
     """Manager class for Broadlink device."""
 
     def __init__(self, dev_type: str, ip_addr: str, mac_addr: str):
@@ -24,11 +24,7 @@ class BroadlinkManager:
             dev_type: Broadlink device type from discover IR command
             ip_addr: Broadlink IP address from discover IR command
             mac_addr: Broadlink MAC address from discover IR command
-
-        Raises:
-            UsageError: raised if controller is not Broadlink or no IR signal is learnt during the process
         """
-
         self.__dev: Device = gendevice(int(dev_type, 0), (ip_addr, DEFAULT_PORT), mac_addr)
         self.__dev.auth()
 
