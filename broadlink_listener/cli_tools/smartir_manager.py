@@ -15,7 +15,7 @@ import click
 from broadlink_listener.cli_tools.broadlink_manager import BroadlinkManager
 
 
-class _DictKeys(Enum, str):
+class _DictKeys(str, Enum):
     CONTROLLER = "supportedController"
     TEMPERATURE = "temperature"
     MIN_TEMP = "minTemperature"
