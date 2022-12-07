@@ -6,12 +6,10 @@
 
 import binascii
 import inspect
-import json
 import logging
 import sys
 import time
 import types
-from itertools import product
 from pathlib import Path
 from typing import Optional, cast
 
@@ -22,6 +20,8 @@ from broadlink.exceptions import ReadError, StorageError
 from cloup import HelpFormatter, HelpTheme, Style, group, option, option_group
 
 from broadlink_listener import __version__
+from broadlink_listener.cli_tools.broadlink_manager import BroadlinkManager
+from broadlink_listener.cli_tools.smartir_manager import SmartIrManager
 from broadlink_listener.cli_tools.utils import configure_logger, get_local_ip_address
 
 formatter_settings = HelpFormatter.settings(
@@ -113,63 +113,12 @@ def generate_smart_ir(
     Raises:
         UsageError: raised if controller is not Broadlink or no IR signal is learnt during the process
     """
-    with open(str(json_file), "r", encoding='utf-8') as in_file:
-        smartir_dict = json.load(in_file)
+    broadlink_mng = BroadlinkManager(dev_type, ip_addr, mac_addr)
+    smart_ir_mng = SmartIrManager(json_file, broadlink_mng)
 
-    try:
-        if smartir_dict["supportedController"] != "Broadlink":
-            logging.error("Controller %s not supported", smartir_dict['supportedController'])
-            raise click.exceptions.UsageError(f"Controller {smartir_dict['supportedController']} not supported")
-
-        min_temp = int(smartir_dict["minTemperature"])
-        max_temp = int(smartir_dict["maxTemperature"])
-        precision_temp = int(smartir_dict.get("precision", 1))
-        op_modes = smartir_dict.get("operationModes", [])
-        fan_modes = smartir_dict.get("fanModes", [])
-        swing_modes = smartir_dict.get("swingModes", [])
-
-    except KeyError as key_err:
-        logging.error("missing mandatory field in json file")
-        logging.error(key_err)
-    else:
-        dev = gendevice(int(dev_type, 0), (ip_addr, DEFAULT_PORT), mac_addr)
-        dev.auth()
-
-        click.echo("First of all, let's learn OFF command...")
-        _countdown()
-        _off = _learn_single_code(dev)
-        if not _off:
-            raise click.exceptions.UsageError("No IR signal learnt for OFF command.")
-        smartir_dict["commands"]["off"] = _off
-
-        all_combinations = product(op_modes, fan_modes, swing_modes, range(min_temp, max_temp + 1, precision_temp))
-        for combination in all_combinations:
-            print(combination)
-
-
-def _countdown():
-    for i in range(5, 0, -1):
-        click.echo(i)
-        time.sleep(1)
-
-
-def _learn_single_code(device: Device) -> Optional[str]:
-    click.echo("Learning...")
-    device.enter_learning()
-    start = time.time()
-    _ret = None
-    while time.time() - start < DEFAULT_TIMEOUT:
-        time.sleep(1)
-        try:
-            data: bytes = device.check_data()
-        except (ReadError, StorageError):
-            continue
-        else:
-            b64_data = binascii.b2a_base64(data, newline=False)
-            _ret = b64_data.decode('utf-8')
-            break
-
-    return _ret
+    smart_ir_mng.learn_off()
+    smart_ir_mng.lear_all()
+    smart_ir_mng.save_dict()
 
 
 if __name__ == "__main__":
