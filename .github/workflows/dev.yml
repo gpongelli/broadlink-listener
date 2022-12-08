@@ -25,7 +25,8 @@ jobs:
     strategy:
       matrix:
         python-versions: [3.8, 3.9, "3.10", "3.11"]
-        os: [ubuntu-20.04, macos-latest, windows-latest]
+        # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+        os: [ubuntu-20.04, ubuntu-22.04]  # dependency issues on macos-latest and windows-latest
     runs-on: ${{ matrix.os }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
