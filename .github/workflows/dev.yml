@@ -46,7 +46,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          poetry install --with devel  -sync
+          poetry install --with devel  --sync
       #    pip install poetry tox tox-gh-actions
 
       - name: linter checks with tox
