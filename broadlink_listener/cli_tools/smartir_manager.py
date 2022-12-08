@@ -28,6 +28,7 @@ class _DictKeys(str, Enum):
     FAN_MODES = "fanModes"
     SWING_MODES = "swingModes"
     COMMANDS = "commands"
+    COMMANDS_ENCODING = "commandsEncoding"
 
 
 _combination_arguments_all = (
@@ -103,6 +104,10 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             _controller = self.__smartir_dict[_DictKeys.CONTROLLER.value]
             if _controller != "Broadlink":
                 raise click.exceptions.UsageError(f"Controller {_controller} not supported")
+
+            _commands_encoding = self.__smartir_dict[_DictKeys.COMMANDS_ENCODING.value]
+            if _commands_encoding != "Base64":
+                raise click.exceptions.UsageError(f"Encoding {_commands_encoding} not supported")
 
             self.__min_temp = int(self.__smartir_dict[_DictKeys.MIN_TEMP.value])
             self.__max_temp = int(self.__smartir_dict[_DictKeys.MAX_TEMP.value])
