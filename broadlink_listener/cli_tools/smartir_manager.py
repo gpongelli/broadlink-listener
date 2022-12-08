@@ -7,6 +7,7 @@
 import json
 import time
 from collections import namedtuple
+from datetime import datetime
 from enum import Enum
 from itertools import product
 from pathlib import Path
@@ -267,7 +268,10 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
 
     def save_dict(self):
         """Save modified dict to output json file."""
-        _modified_file_name = Path(self.__json_file_name.parent).joinpath(f"{self.__json_file_name.stem}.json")
+        now = datetime.now()
+        _modified_file_name = Path(self.__json_file_name.parent).joinpath(
+            f'{self.__json_file_name.stem}_' f'{now.strftime("%Y%m%d_%H%M%S")}.json'
+        )
         with open(_modified_file_name, 'w', encoding='utf-8') as out_file:
             json.dump(self.__smartir_dict, out_file)
 
