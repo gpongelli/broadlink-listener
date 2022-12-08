@@ -37,7 +37,7 @@
         optional = true
         [tool.poetry.group.devel.dependencies]
             pip  = "^22.3.1"
-            black  = "^22.0"
+            black  = "^22.10.0"
             isort  = "^5.8.0"
             flake8  = "^3.9.2"
             flake8-docstrings = "^1.6.0"
