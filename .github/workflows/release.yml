@@ -60,7 +60,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          poetry install --with devel
+          poetry install --with devel --sync
 
       #- name: build documentation
       #  run: |
