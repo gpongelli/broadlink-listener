@@ -348,4 +348,3 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         if comb.operationModes in self.__no_temp_on_modes:  # type: ignore
             _ret = True
         return _ret
-
