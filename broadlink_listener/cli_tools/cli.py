@@ -116,7 +116,7 @@ def generate_smart_ir(
 
 
 if __name__ == "__main__":
-    # sys.exit(main())  # pragma: no cover  # pylint: disable=no-value-for-parameter
+    sys.exit(main())  # pragma: no cover  # pylint: disable=no-value-for-parameter
 
     # local test
-    sys.exit(main(['discover-ir']))
+    # sys.exit(main(['discover-ir']))
