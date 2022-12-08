@@ -11,6 +11,7 @@ from datetime import datetime
 from enum import Enum
 from itertools import product
 from pathlib import Path
+from typing import Union
 
 import click
 
@@ -296,14 +297,9 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         Raises:
             UsageError: if no IR signal is learnt within timeout
         """
+        _first_code_learnt_when_skip = False
+        _previous_code = None
         for comb in self.__all_combinations:
-            _combination_str = self._get_combination(comb)
-            _countdown(
-                f"Let's learn command of\n{_combination_str}\n"
-                "Prepare the remote to this combination, then turn it OFF. When 'Listening' message"
-                " is on screen, turn the remote ON to learn combination previously set..."
-            )
-
             self.operation_mode = comb.operationModes
             if _DictKeys.FAN_MODES in comb:
                 self.fan_mode = comb.fanModes
@@ -311,7 +307,21 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
                 self.swing_mode = comb.swingModes
             self.temperature = comb.temperature
 
+            if self._skip_learning(comb):
+                if _first_code_learnt_when_skip:
+                    self._set_dict_value(_previous_code)
+                    continue
+
+                _first_code_learnt_when_skip = True
+
+            _combination_str = self._get_combination(comb)
+            _countdown(
+                f"Let's learn command of\n{_combination_str}\n"
+                "Prepare the remote to this combination, then turn it OFF. When 'Listening' message"
+                " is on screen, turn the remote ON to learn combination previously set..."
+            )
             _code = self.__broadlink_manager.learn_single_code()
+            _previous_code = _code
             if not _code:
                 raise click.exceptions.UsageError(f"No IR signal learnt for {_combination_str} command within timeout.")
 
@@ -323,3 +333,14 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         for _m in _mixed:
             _ret.append(' = '.join(_m))
         return '\n'.join(_ret)
+
+    def _skip_learning(
+        self, comb: Union[_CombinationTupleAll, _CombinationTupleSwing, _CombinationTupleFan, _CombinationTupleNone]
+    ) -> bool:
+        _ret = False
+        if _DictKeys.SWING_MODES in comb._fields and comb.operationModes in self.__no_swing_on_modes:  # type: ignore
+            _ret = True
+        if comb.operationModes in self.__no_temp_on_modes:  # type: ignore
+            _ret = True
+        return _ret
+
