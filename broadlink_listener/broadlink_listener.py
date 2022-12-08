@@ -1,5 +1,0 @@
-# SPDX-FileCopyrightText: 2022 Gabriele Pongelli
-#
-# SPDX-License-Identifier: MIT
-
-"""Main module."""
