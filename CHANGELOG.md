@@ -1,3 +1,9 @@
+## 0.1.1 (2022-12-09)
+
+### Fix
+
+- github action follow semantic versioning
+
 ## 0.1.0 (2022-12-09)
 
 ### Feat
