@@ -1,3 +1,11 @@
+## 0.1.2 (2022-12-09)
+
+### Fix
+
+- use GITHUB_OUTPUT
+- align refs/tags to semantic versioning
+- github deprecate set-output
+
 ## 0.1.1 (2022-12-09)
 
 ### Fix
