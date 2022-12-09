@@ -52,15 +52,14 @@ jobs:
           python -m pip install --upgrade pip
           poetry install --with devel --sync
 
-      #- name: build documentation
-      #  run: |
-      #    poetry install --with devel
-      #    poetry run mkdocs build
-      #- name: publish documentation
-      #  uses: peaceiris/actions-gh-pages@v3
-      #  with:
-      #    personal_token: ${{ secrets.PERSONAL_TOKEN }}
-      #    publish_dir: ./site
+      - name: build documentation
+        run: poetry run tox -e docs
+
+      - name: publish documentation
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.PERSONAL_TOKEN }}
+          publish_dir: ./docs/build/html
 
       - name: Build wheels and source tarball
         run: >-
