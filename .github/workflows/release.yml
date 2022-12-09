@@ -32,7 +32,7 @@ jobs:
       - name: Get version from tag
         id: tag_name
         run: |
-          echo "name=current_version::${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          echo "name=current_version::${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
         shell: bash
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
