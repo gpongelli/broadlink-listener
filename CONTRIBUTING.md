@@ -46,45 +46,42 @@ If you are proposing a feature:
 
 ## Get Started!
 
-Ready to contribute? Here's how to set up `broadlink-listener` for local development.
+Ready to contribute? Here's how to set up broadlink-listener for local development:
 
-1. Fork the `broadlink-listener` repo on GitHub.
-2. Clone your fork locally
+1. Fork the broadlink-listener repo on GitHub.
 
-    ```
-    $ git clone git@github.com:your_name_here/broadlink-listener.git
-    ```
+2. Clone your fork locally:
+   ```bash
+   $ git clone git@github.com:your_name_here/broadlink-listener.git
+   ```
 
 3. Ensure [poetry](https://python-poetry.org/docs/) is installed.
-4. Install dependencies and start your virtualenv:
 
-    ```
-    $ poetry update
-    $ poetry install --with devel
-    ```
+4. Install dependencies and start your virtualenv:
+   ```bash
+   $ poetry update
+   $ poetry install --with devel
+   ```
 
 5. Create a branch for local development:
+   ```bash
+   $ git checkout -b name-of-your-bugfix-or-feature
+   ```
 
-    ```
-    $ git checkout -b name-of-your-bugfix-or-feature
-    ```
-
-    Now you can make your changes locally.
+   Now you can make your changes locally.
 
 6. When you're done making changes, check that your changes pass flake8 and
    tests, including testing other Python versions, with tox:
-
-    ```
+   ```bash
     $ poetry run tox -e format -e lint
-    ```
+   ```
 
 7. Commit your changes and push your branch to GitHub:
-
-    ```
-    $ git add .
-    $ git commit -m "Your detailed description of your changes."
-    $ git push origin name-of-your-bugfix-or-feature
-    ```
+   ```bash
+   $ git add .
+   $ git commit -m "Your detailed description of your changes."
+   $ git push origin name-of-your-bugfix-or-feature
+   ```
 
 8. Submit a pull request through the GitHub website.
 
@@ -95,14 +92,14 @@ Before you submit a pull request, check that it meets these guidelines:
 1. The pull request should include tests.
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
-   feature to the list in README.md.
+   feature to the list in README.md .
 3. The pull request should work for Python 3.8, 3.9, 3.10 and 3.11. Check
-   https://github.com/gpongelli/broadlink-listener/actions
+   [repo action](https://github.com/gpongelli/broadlink-listener/actions)
    and make sure that the tests pass for all supported Python versions.
 
 ## Tips
 
-```
+```bash
 $ poetry run pytest tests/test_broadlink_listener.py
 ```
 
@@ -115,7 +112,7 @@ A reminder for the maintainers on how to deploy.
 Make sure all your changes are committed, be sure to follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) so CHANGELOG.md file will automatically filled by commitizen tool.
 Then run:
 
-```
+```bash
 $ poetry run cz bump
 $ git push
 $ git push --tags
