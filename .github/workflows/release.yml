@@ -32,7 +32,7 @@ jobs:
       - name: Get version from tag
         id: tag_name
         run: |
-          echo "name=current_version::${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
         shell: bash
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -44,7 +44,7 @@ jobs:
         uses: mindsers/changelog-reader-action@v2
         with:
           validation_depth: 10
-          version: ${{ steps.tag_name.outputs.current_version }}
+          version: ${{ steps.tag_name.outputs.NAME }}
           path: ./CHANGELOG.md
 
       # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#caching-packages
