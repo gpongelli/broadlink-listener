@@ -42,12 +42,10 @@ jobs:
       # https://github.com/mindsers/changelog-reader-action
       - name: TEST Conventional Changelog Action
         id: changelog
-        uses: TriPSs/conventional-changelog-action@v3
-        with:
-          output-file: "false"
+        uses: BinPar/read-conventional-commit-changelog@v2.0.0
 
       - name: TEST read changelog
-        run: echo "${{ steps.changelog.outputs.clean_changelog }}"
+        run: echo "${{ steps.changelog.outputs.version-changelog }}"
 
       # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#caching-packages
       - name: Install Poetry
