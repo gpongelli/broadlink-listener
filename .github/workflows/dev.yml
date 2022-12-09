@@ -50,6 +50,15 @@ jobs:
           poetry install --with devel  --sync
       #    pip install poetry tox tox-gh-actions
 
+      - name: build documentation
+        run: poetry run tox -e docs
+
+      - name: publish documentation
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.PERSONAL_TOKEN }}
+          publish_dir: ./docs/build/html
+
       - name: linter checks with tox
         run:
           poetry run tox -e lint
