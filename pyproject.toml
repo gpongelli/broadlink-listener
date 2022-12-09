@@ -4,7 +4,7 @@
 
 [tool.poetry]
     name = "broadlink-listener"
-    version = "0.0.0"
+    version = "0.1.0"
     homepage = "https://github.com/gpongelli/broadlink-listener"
     description = "Broadlink IR codes listener and SmartIR json generator."
     authors = ["Gabriele Pongelli <gabriele.pongelli@gmail.com>"]
@@ -102,7 +102,7 @@
 
 [tool.commitizen]
     name = "cz_conventional_commits"
-    version = "0.0.0"
+    version = "0.1.0"
     version_files = [
         "broadlink_listener/__init__.py:__version__",
         "pyproject.toml:version"
