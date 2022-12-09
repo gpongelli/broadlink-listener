@@ -2,17 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-# Publish package on main branch if it's tagged with 'v*'
+# This is a basic workflow to help you get started with Actions
 
-name: release & publish workflow
+name: docs workflow
 
 # Controls when the action will run.
 on:
-  # Triggers the workflow on push events but only for the master branch
-  push:
-    tags:
-      - '*.*.*'
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -24,24 +19,24 @@ permissions:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "release"
-  release:
-    name: Create Release
-    runs-on: ubuntu-20.04
+  # This workflow contains a single job called "test"
+  test:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
+    # The type of runner that the job will run on
     strategy:
       matrix:
         python-versions: [3.9]
+        # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+        os: [ubuntu-20.04]  # dependency issues on macos-latest and windows-latest
+    runs-on: ${{ matrix.os }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
-      # https://github.com/BinPar/read-conventional-commit-changelog
-      - name: Get Changelog Entry
-        id: changelog
-        uses: BinPar/read-conventional-commit-changelog@v2.0.0
 
       # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#caching-packages
       - name: Install Poetry
@@ -56,47 +51,19 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          poetry install --with devel --sync
+          poetry install --with devel  --sync
+      #    pip install poetry tox tox-gh-actions
 
-      # Build and publish documentation
       - name: Setup Pages
         uses: actions/configure-pages@v2
 
       - name: build documentation
         run: poetry run tox -e docs
 
-      - name: Upload doc artifact
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: './docs/build/html'
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
-
-      - name: Build wheels and source tarball
-        run: >-
-          poetry build
-
-      - name: show temporary files
-        run: >-
-          ls -l
-
-      # https://github.com/softprops/action-gh-release
-      - name: create github release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        with:
-          token: ${{ secrets.make_gh_release_token }}
-          body: ${{ steps.changelog.outputs.version-changelog }}
-          files: dist/*.whl
-          draft: false
-          prerelease: false
-
-      # https://github.com/pypa/gh-action-pypi-publish
-      - name: publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: ${{ secrets.pypi_username }}
-          password: ${{ secrets.pypi_password }}
-          skip_existing: true

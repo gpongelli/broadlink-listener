@@ -50,6 +50,9 @@ jobs:
           poetry install --with devel  --sync
       #    pip install poetry tox tox-gh-actions
 
+      - name: build documentation
+        run: poetry run tox -e docs
+
       - name: linter checks with tox
         run:
           poetry run tox -e lint
