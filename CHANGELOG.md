@@ -1,3 +1,10 @@
+## 0.2.0 (2022-12-09)
+
+### Feat
+
+- github pages on release
+- build docs with tox
+
 ## 0.1.3 (2022-12-09)
 
 ### Fix
