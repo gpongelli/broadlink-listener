@@ -52,14 +52,21 @@ jobs:
           python -m pip install --upgrade pip
           poetry install --with devel --sync
 
+      # Build and publish documentation
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+
       - name: build documentation
         run: poetry run tox -e docs
 
-      - name: publish documentation
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload doc artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          personal_token: ${{ secrets.PERSONAL_TOKEN }}
-          publish_dir: ./docs/build/html
+          path: './docs/build/html'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
 
       - name: Build wheels and source tarball
         run: >-
