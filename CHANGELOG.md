@@ -1,3 +1,10 @@
+## 0.1.3 (2022-12-09)
+
+### Fix
+
+- sphinx file generation
+- using github action for conventional commits
+
 ## 0.1.2 (2022-12-09)
 
 ### Fix
