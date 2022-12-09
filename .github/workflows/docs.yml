@@ -1,0 +1,75 @@
+# SPDX-FileCopyrightText: 2022 Gabriele Pongelli
+#
+# SPDX-License-Identifier: MIT
+
+# This is a basic workflow to help you get started with Actions
+
+name: docs workflow
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "test"
+  test:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # The type of runner that the job will run on
+    strategy:
+      matrix:
+        python-versions: [3.9]
+        # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+        os: [ubuntu-20.04]  # dependency issues on macos-latest and windows-latest
+    runs-on: ${{ matrix.os }}
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#caching-packages
+      - name: Install Poetry
+        run: pipx install poetry
+
+      # https://github.com/actions/setup-python
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-versions }}
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          poetry install --with devel  --sync
+      #    pip install poetry tox tox-gh-actions
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+
+      - name: build documentation
+        run: poetry run tox -e docs
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './docs/build/html'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
