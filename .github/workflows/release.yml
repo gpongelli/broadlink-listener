@@ -29,23 +29,13 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Get version from tag
-        id: tag_name
-        run: |
-          echo "NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-        shell: bash
-
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # https://github.com/mindsers/changelog-reader-action
+      # https://github.com/BinPar/read-conventional-commit-changelog
       - name: Get Changelog Entry
-        id: changelog_reader
-        uses: mindsers/changelog-reader-action@v2
-        with:
-          validation_depth: 10
-          version: ${{ steps.tag_name.outputs.NAME }}
-          path: ./CHANGELOG.md
+        id: changelog
+        uses: BinPar/read-conventional-commit-changelog@v2.0.0
 
       # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#caching-packages
       - name: Install Poetry
@@ -86,7 +76,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.make_gh_release_token }}
-          body: ${{ steps.changelog_reader.outputs.changes }}
+          body: ${{ steps.changelog.outputs.version-changelog }}
           files: dist/*.whl
           draft: false
           prerelease: false
