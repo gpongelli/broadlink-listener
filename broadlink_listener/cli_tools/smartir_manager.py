@@ -7,11 +7,12 @@
 import json
 import time
 from collections import namedtuple
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from itertools import product
 from pathlib import Path
-from typing import Union
+from typing import Literal, Optional, Union
 
 import click
 
@@ -29,6 +30,14 @@ class _DictKeys(str, Enum):
     SWING_MODES = "swingModes"
     COMMANDS = "commands"
     COMMANDS_ENCODING = "commandsEncoding"
+
+
+@dataclass
+class SkipReason:
+    """Data class to describe skip reason."""
+
+    skip: bool
+    field: Optional[Union[Literal[_DictKeys.SWING_MODES], Literal[_DictKeys.TEMPERATURE]]]
 
 
 _combination_arguments_all = (
@@ -100,6 +109,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         self.__all_combinations: tuple = ()
         self.__no_temp_on_modes: tuple = no_temp_on_mode
         self.__no_swing_on_modes: tuple = no_swing_on_mode
+        self.__swing_saved_temp: dict = {}
         try:
             _controller = self.__smartir_dict[_DictKeys.CONTROLLER.value]
             if _controller != "Broadlink":
@@ -280,6 +290,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         )
         with open(_modified_file_name, 'w', encoding='utf-8') as out_file:
             json.dump(self.__smartir_dict, out_file)
+        click.echo(f"Created new file {_modified_file_name}")
 
     def learn_off(self):
         """Learn OFF command that's outside the combination.
@@ -302,7 +313,6 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         Raises:
             UsageError: if no IR signal is learnt within timeout
         """
-        _first_code_learnt_when_skip = False
         _previous_code = None
         for comb in self.__all_combinations:
             self.operation_mode = comb.operationModes
@@ -310,14 +320,22 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
                 self.fan_mode = comb.fanModes
             if _DictKeys.SWING_MODES in comb:
                 self.swing_mode = comb.swingModes
-            self.temperature = comb.temperature
+            self.temperature = str(comb.temperature)
 
-            if self._skip_learning(comb):
-                if _first_code_learnt_when_skip:
-                    self._set_dict_value(_previous_code)
-                    continue
+            _do_skip = self._skip_learning(comb)
+            if _do_skip.skip:
+                # must read the first temperature and then reuse the same for next combination
+                if _do_skip.field == _DictKeys.TEMPERATURE:
+                    if comb.temperature > self.__min_temp:
+                        # code @ min_temp already recorded
+                        self._set_dict_value(_previous_code)
+                        continue
 
-                _first_code_learnt_when_skip = True
+                if _do_skip.field == _DictKeys.SWING_MODES:
+                    _previous_code = self.__swing_saved_temp.get(self.temperature, None)
+                    if _previous_code:
+                        self._set_dict_value(_previous_code)
+                        continue
 
             _combination_str = self._get_combination(comb)
             _countdown(
@@ -330,7 +348,12 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             if not _code:
                 raise click.exceptions.UsageError(f"No IR signal learnt for {_combination_str} command within timeout.")
 
+            # swing modes must be saved because all temperature need to be listened
+            if _do_skip.skip and _do_skip.field == _DictKeys.SWING_MODES:
+                self.__swing_saved_temp[self.temperature] = _code
+
             self._set_dict_value(_code)
+        click.echo("All combination learnt.")
 
     def _get_combination(self, combination: tuple) -> str:
         _mixed = zip(self.__combination_arguments, combination)
@@ -341,10 +364,11 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
 
     def _skip_learning(
         self, comb: Union[_CombinationTupleAll, _CombinationTupleSwing, _CombinationTupleFan, _CombinationTupleNone]
-    ) -> bool:
-        _ret = False
+    ) -> SkipReason:
+        _ret = SkipReason(False, None)
+        # swing mode is optional, so need its check
         if _DictKeys.SWING_MODES in comb._fields and comb.operationModes in self.__no_swing_on_modes:  # type: ignore
-            _ret = True
+            _ret = SkipReason(True, _DictKeys.SWING_MODES)
         if comb.operationModes in self.__no_temp_on_modes:  # type: ignore
-            _ret = True
+            _ret = SkipReason(True, _DictKeys.TEMPERATURE)
         return _ret
