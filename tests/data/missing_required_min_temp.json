@@ -1,0 +1,14 @@
+{
+  "manufacturer": "fakeManufacturer",
+  "commandsEncoding": "Base64",
+  "supportedController": "Broadlink",
+  "maxTemperature": 30,
+  "precision": 1,
+  "operationModes": [
+    "cool",
+    "heat"
+  ],
+  "commands": {
+    "off": "JgCSAAABKJQVNhYSFRMVExUSFRMVNxUSFTcVNxUTFTcVEhUTFRMVEhUTFRMVEhUTFRMVEhUTFRMVEhUTFRMVEhU3FRMVNxYRFRMVNxUTFQACkRY2FRMVEhUTFRMVEhUTFRMVEhUTFRMVEhUTFTcVEhYSFRMVEhYSFRMVEhYSFRMVEhUTFRMVEhUTFRMVEhYSFTcVAA0FAAAAAAAA="
+  }
+}

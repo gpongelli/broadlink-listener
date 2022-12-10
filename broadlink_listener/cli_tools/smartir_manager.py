@@ -85,7 +85,11 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
     """Manager class for SmartIR json."""
 
     def __init__(
-        self, file_name: Path, broadlink_mng: BroadlinkManager, no_temp_on_mode: tuple, no_swing_on_mode: tuple
+        self,
+        file_name: Path,
+        broadlink_mng: BroadlinkManager,
+        no_temp_on_mode: tuple = tuple(),
+        no_swing_on_mode: tuple = tuple(),
     ):
         """Smart IR Manager.
 
