@@ -6,6 +6,7 @@
 
 import pytest
 from pathlib import Path
+from click.testing import CliRunner
 
 
 @pytest.fixture
@@ -56,3 +57,8 @@ def json_file_missing_operation_modes() -> Path:
         json's path file
     """
     return Path.cwd().joinpath("tests").joinpath("data").joinpath("missing_required_operation_modes.json")
+
+
+@pytest.fixture(scope="function")
+def runner(request):
+    return CliRunner()
