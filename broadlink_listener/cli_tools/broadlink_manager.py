@@ -6,12 +6,13 @@
 
 import binascii
 import time
-from typing import Optional
+from typing import Optional, cast
 
 import click
-from broadlink import Device, gendevice
+from broadlink import gendevice
 from broadlink.const import DEFAULT_PORT, DEFAULT_TIMEOUT
 from broadlink.exceptions import ReadError, StorageError
+from broadlink.remote import rmmini
 
 
 class BroadlinkManager:  # pylint: disable=too-few-public-methods
@@ -25,8 +26,26 @@ class BroadlinkManager:  # pylint: disable=too-few-public-methods
             ip_addr: Broadlink IP address from discover IR command
             mac_addr: Broadlink MAC address from discover IR command
         """
-        self.__dev: Device = gendevice(int(dev_type, 0), (ip_addr, DEFAULT_PORT), mac_addr)
+        self.__dev: rmmini = cast(rmmini, gendevice(int(dev_type, 0), (ip_addr, DEFAULT_PORT), mac_addr))
         self.__dev.auth()
+
+    @property
+    def device(self) -> rmmini:
+        """Broadlink device.
+
+        Returns:
+            rmmini device object
+        """
+        return self.__dev
+
+    @device.setter
+    def device(self, value) -> None:
+        """Broadlink device setter.
+
+        Arguments:
+            value: new value to be set
+        """
+        self.__dev = value
 
     def learn_single_code(self) -> Optional[str]:
         """Process to learn single IR code.
@@ -35,13 +54,13 @@ class BroadlinkManager:  # pylint: disable=too-few-public-methods
             Optional[str]: str if IR code was listened, None otherwise
         """
         click.echo("Listening...")
-        self.__dev.enter_learning()
+        self.device.enter_learning()
         start = time.time()
         _ret = None
         while time.time() - start < DEFAULT_TIMEOUT:
             time.sleep(1)
             try:
-                data: bytes = self.__dev.check_data()
+                data: bytes = self.device.check_data()
             except (ReadError, StorageError):
                 continue
             else:
