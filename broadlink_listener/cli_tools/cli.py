@@ -116,8 +116,6 @@ def generate_smart_ir(
 
 
 if __name__ == "__main__":
-    sys.exit(main(['generate-smart-ir', str(Path.cwd().parent.parent.joinpath("tests").joinpath("data").joinpath("not_base64.json")),
-                   'devtype', 'addr', 'mac']))
     sys.exit(main())  # pragma: no cover  # pylint: disable=no-value-for-parameter
 
     # local test
