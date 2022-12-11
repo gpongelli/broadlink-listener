@@ -100,7 +100,7 @@ Before you submit a pull request, check that it meets these guidelines:
 ## Tips
 
 ```bash
-$ poetry run pytest tests/test_broadlink_listener.py
+$ poetry run pytest tests/test_cli.py
 ```
 
 To run a subset of tests.

@@ -6,37 +6,24 @@
 
 import pytest
 from click.testing import CliRunner
-
+from unittest.mock import patch, Mock
+from pathlib import Path
 from broadlink_listener.cli_tools import cli
+from broadlink_listener import __version__
 
 
-@pytest.fixture
-def response():
-    """Sample pytest fixture.
-
-    See more at: http://doc.pytest.org/en/latest/fixture.html
-    """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
-
-
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument.
-
-    Arguments:
-        response: pytest feature
-    """
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
-    del response
-
-
-def test_command_line_interface_help():
+def test_command_line_interface_help(runner):
     """Test the CLI."""
-    runner = CliRunner()
     help_result = runner.invoke(cli.main, ['--help'])
     assert help_result.exit_code == 0
     assert '  --help     Show this message and exit.' in help_result.output
+
+
+def test_command_line_interface_version(runner):
+    """Test the CLI."""
+    help_result = runner.invoke(cli.main, ['--version'])
+    assert help_result.exit_code == 0
+    assert __version__ in help_result.output
 
 
 def test_py_version():
