@@ -4,8 +4,6 @@
 
 """Tests for `broadlink_listener` package."""
 
-import pytest
-from click.testing import CliRunner
 from unittest.mock import patch, Mock
 from pathlib import Path
 from broadlink_listener.cli_tools import cli
@@ -13,14 +11,22 @@ from broadlink_listener import __version__
 
 
 def test_command_line_interface_help(runner):
-    """Test the CLI."""
+    """Test the CLI.
+
+    Arguments:
+        runner: pytest click CliRunner object
+    """
     help_result = runner.invoke(cli.main, ['--help'])
     assert help_result.exit_code == 0
     assert '  --help     Show this message and exit.' in help_result.output
 
 
 def test_command_line_interface_version(runner):
-    """Test the CLI."""
+    """Test the CLI.
+
+    Arguments:
+        runner: pytest click CliRunner object
+    """
     help_result = runner.invoke(cli.main, ['--version'])
     assert help_result.exit_code == 0
     assert __version__ in help_result.output

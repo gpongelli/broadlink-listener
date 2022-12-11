@@ -61,4 +61,9 @@ def json_file_missing_operation_modes() -> Path:
 
 @pytest.fixture(scope="function")
 def runner(request):
+    """Pytest runner fixture.
+
+    Arguments:
+        request: pytest request
+    """
     return CliRunner()
