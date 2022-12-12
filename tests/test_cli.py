@@ -4,8 +4,6 @@
 
 """Tests for `broadlink_listener` package."""
 
-from unittest.mock import patch, Mock
-from pathlib import Path
 from broadlink_listener.cli_tools import cli
 from broadlink_listener import __version__
 

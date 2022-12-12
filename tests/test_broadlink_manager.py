@@ -14,8 +14,12 @@ class TestBroadlinkManager:
 
     @patch('broadlink.device.Device.auth', Mock(return_value=True))
     @patch('broadlink.gendevice')
-    def test_init(self):
-        """Test initialization."""
+    def test_init(self, patched_auth):
+        """Test initialization.
+
+        Arguments:
+            patched_auth: patched version of broadlink Device's auth method.
+        """
         _ = BroadlinkManager('0x1234', '192.168.1.1', '12345678')
 
         with pytest.raises(ValueError):

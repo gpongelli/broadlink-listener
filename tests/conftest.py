@@ -65,5 +65,8 @@ def runner(request):
 
     Arguments:
         request: pytest request
+
+    Returns:
+        Click CliRunner object
     """
     return CliRunner()
