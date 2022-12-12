@@ -4,8 +4,8 @@
 
 """Tests for `broadlink_listener` package."""
 
-from broadlink_listener.cli_tools import cli
 from broadlink_listener import __version__
+from broadlink_listener.cli_tools import cli
 
 
 def test_command_line_interface_help(runner):

@@ -3,9 +3,13 @@
 # SPDX-License-Identifier: MIT
 
 """Test Broadlink manager module."""
-
-import pytest
 from unittest.mock import Mock, patch
+
+import broadlink.remote
+import pytest
+from broadlink import gendevice
+from broadlink.const import DEFAULT_PORT
+
 from broadlink_listener.cli_tools.broadlink_manager import BroadlinkManager
 
 
@@ -27,3 +31,10 @@ class TestBroadlinkManager:
 
         with pytest.raises(ValueError):
             _ = BroadlinkManager('abcs', '192.168.1.1', '12345678')
+
+    def test_rmmini_device(self):
+
+        _a = gendevice(0x51DA, ('192.168.1.1', DEFAULT_PORT), '12345678')
+
+        assert issubclass(type(_a), broadlink.remote.rmmini)
+        assert hasattr(_a, 'enter_learning')

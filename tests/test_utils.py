@@ -4,10 +4,11 @@
 
 """Test utils module."""
 
-from broadlink_listener.cli_tools.utils import configure_logger, get_local_ip_address
-from unittest.mock import patch, Mock
 import logging
 import socket
+from unittest.mock import Mock, patch
+
+from broadlink_listener.cli_tools.utils import configure_logger, get_local_ip_address
 
 
 @patch('logging.basicConfig')

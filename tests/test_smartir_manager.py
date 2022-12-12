@@ -4,9 +4,11 @@
 
 """Test smartir manager module."""
 
+from unittest.mock import Mock
+
 import click
 import pytest
-from unittest.mock import Mock
+
 from broadlink_listener.cli_tools.smartir_manager import SmartIrManager
 
 
