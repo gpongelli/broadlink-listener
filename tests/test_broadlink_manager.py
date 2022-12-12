@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 """Test Broadlink manager module."""
+import binascii
 from unittest.mock import Mock, patch
 
 import broadlink.remote
@@ -44,3 +45,16 @@ class TestBroadlinkManager:
         _a = BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
         assert issubclass(type(_a.device), broadlink.remote.rmmini)
         assert hasattr(_a.device, 'enter_learning')
+
+    def test_learn_code(self):
+        """Test rmmini device learn mode."""
+        _code_value = b'12345678'
+        b64_data = binascii.b2a_base64(_code_value, newline=False)
+        _expected = b64_data.decode('utf-8')
+
+        with patch('broadlink.remote.rmmini.enter_learning'), patch(
+            'broadlink.device.Device.auth', Mock(return_value=True)
+        ), patch('broadlink.remote.rmmini.check_data', Mock(return_value=_code_value)):
+            _a = BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
+            _code = _a.learn_single_code()
+            assert _expected == _code
