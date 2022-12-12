@@ -10,6 +10,7 @@ import broadlink.remote
 import pytest
 from broadlink import gendevice
 from broadlink.const import DEFAULT_PORT
+from broadlink.exceptions import ReadError
 
 from broadlink_listener.cli_tools.broadlink_manager import BroadlinkManager
 
@@ -57,4 +58,19 @@ class TestBroadlinkManager:
         ), patch('broadlink.remote.rmmini.check_data', Mock(return_value=_code_value)):
             _a = BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
             _code = _a.learn_single_code()
+            assert _expected == _code
+
+    def test_learn_code_exception(self):
+        """Test rmmini device learn mode, exception case will retrieve None ."""
+        _expected = None
+
+        with patch('broadlink.remote.rmmini.enter_learning'), patch('time.sleep'), patch(
+            'broadlink.device.Device.auth', Mock(return_value=True)
+        ), patch('broadlink.remote.rmmini.check_data', Mock(side_effect=ReadError(-10))), patch(
+            'broadlink.const.DEFAULT_TIMEOUT', Mock(return_value=1)
+        ):
+
+            _a = BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
+            _code = _a.learn_single_code()
+
             assert _expected == _code
