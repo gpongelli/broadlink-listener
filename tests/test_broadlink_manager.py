@@ -33,12 +33,14 @@ class TestBroadlinkManager:
             _ = BroadlinkManager('abcs', '192.168.1.1', '12345678')
 
     def test_rmmini_device(self):
+        """Test rmmini device creation with gendevice."""
         _a = gendevice(0x51DA, ('192.168.1.1', DEFAULT_PORT), '12345678')
         assert issubclass(type(_a), broadlink.remote.rmmini)
         assert hasattr(_a, 'enter_learning')
 
     @patch('broadlink.device.Device.auth', Mock(return_value=True))
     def test_broadlink_manager_device(self):
+        """Test rmmini device creation with BroadlinkManager."""
         _a = BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
         assert issubclass(type(_a.device), broadlink.remote.rmmini)
         assert hasattr(_a.device, 'enter_learning')
