@@ -41,7 +41,7 @@ jobs:
       # https://github.com/BinPar/read-conventional-commit-changelog
       - name: Get Changelog Entry
         id: changelog
-        uses: BinPar/read-conventional-commit-changelog@v2.0.0
+        uses: BinPar/read-conventional-commit-changelog@v2.0.2
 
       # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#caching-packages
       - name: Install Poetry
