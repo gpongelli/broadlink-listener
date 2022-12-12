@@ -38,15 +38,6 @@ class BroadlinkManager:  # pylint: disable=too-few-public-methods
         """
         return self.__dev
 
-    @device.setter
-    def device(self, value) -> None:
-        """Broadlink device setter.
-
-        Arguments:
-            value: new value to be set
-        """
-        self.__dev = value
-
     def learn_single_code(self) -> Optional[str]:
         """Process to learn single IR code.
 
