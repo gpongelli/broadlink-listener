@@ -142,13 +142,13 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
                 if _swing_dict:
                     _fan_mode_dict = {f"{f}": deepcopy(_swing_dict) for f in self.__fan_modes}
                 else:
-                    _fan_mode_dict = {f"{f}": deepcopy(_temp_dict) for f in self.__fan_modes}
+                    _fan_mode_dict = {f"{f}": deepcopy(_temp_dict) for f in self.__fan_modes}  # type: ignore
                 _operation_dict = {f"{o}": deepcopy(_fan_mode_dict) for o in self.__op_modes}
             else:
                 if _swing_dict:
-                    _operation_dict = {f"{o}": deepcopy(_swing_dict) for o in self.__op_modes}
+                    _operation_dict = {f"{o}": deepcopy(_swing_dict) for o in self.__op_modes}  # type: ignore
                 else:
-                    _operation_dict = {f"{o}": deepcopy(_temp_dict) for o in self.__op_modes}
+                    _operation_dict = {f"{o}": deepcopy(_temp_dict) for o in self.__op_modes}  # type: ignore
             self.__smartir_dict[_DictKeys.COMMANDS].update(_operation_dict)
         except KeyError as key_err:
             raise click.exceptions.UsageError(f"Missing mandatory field in json file: {key_err}") from None

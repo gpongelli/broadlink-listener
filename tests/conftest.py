@@ -51,6 +51,46 @@ def json_file_missing_min_temp() -> Path:
 
 
 @pytest.fixture
+def json_file_good_data_op_mode() -> Path:
+    """Return json test file with good structure.
+
+    Returns:
+        json's path file
+    """
+    return Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_mode.json")
+
+
+@pytest.fixture
+def json_file_good_data_op_fan_mode() -> Path:
+    """Return json test file with good structure.
+
+    Returns:
+        json's path file
+    """
+    return Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_fan_mode.json")
+
+
+@pytest.fixture
+def json_file_good_data_op_fan_swing_mode() -> Path:
+    """Return json test file with good structure.
+
+    Returns:
+        json's path file
+    """
+    return Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_fan_swing_mode.json")
+
+
+@pytest.fixture
+def json_file_good_data_op_swing_mode() -> Path:
+    """Return json test file with good structure.
+
+    Returns:
+        json's path file
+    """
+    return Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_swing_mode.json")
+
+
+@pytest.fixture
 def json_file_missing_operation_modes() -> Path:
     """Return json test file without operation modes.
 
