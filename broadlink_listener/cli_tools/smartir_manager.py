@@ -391,7 +391,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         _mixed = zip(self.__combination_arguments, combination)
         _ret = []
         for _m, _v in _mixed:
-            _ret.append(f'{_m} = {_v}')
+            _ret.append(f'-> {_m} = {_v}')
         return '\n'.join(_ret)
 
     def _skip_learning(
