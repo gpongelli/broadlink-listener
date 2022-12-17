@@ -198,7 +198,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
                             yield _CombinationTupleSwing(_c[0], _c[1], _c[2])
 
                     self.__all_combinations = _return_named_tuple()
-                    self.__combination_arguments = _combination_arguments_all
+                    self.__combination_arguments = _combination_arguments_swing
                 else:
                     __combinations = product(
                         self.__op_modes,
@@ -348,9 +348,9 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         _previous_code = None
         for comb in self.__all_combinations:
             self.operation_mode = comb.operationModes
-            if _DictKeys.FAN_MODES in comb:
+            if _DictKeys.FAN_MODES in comb._fields:
                 self.fan_mode = comb.fanModes
-            if _DictKeys.SWING_MODES in comb:
+            if _DictKeys.SWING_MODES in comb._fields:
                 self.swing_mode = comb.swingModes
             self.temperature = str(comb.temperature)
 
@@ -390,8 +390,8 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
     def _get_combination(self, combination: tuple) -> str:
         _mixed = zip(self.__combination_arguments, combination)
         _ret = []
-        for _m in _mixed:
-            _ret.append(' = '.join(_m))
+        for _m, _v in _mixed:
+            _ret.append(f'{_m} = {_v}')
         return '\n'.join(_ret)
 
     def _skip_learning(
