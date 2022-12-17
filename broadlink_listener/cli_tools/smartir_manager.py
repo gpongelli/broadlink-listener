@@ -7,6 +7,7 @@
 import json
 import time
 from collections import namedtuple
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
@@ -130,6 +131,25 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             self.__fan_modes = self.__smartir_dict.get(_DictKeys.FAN_MODES.value, None)
             self.__swing_modes = self.__smartir_dict.get(_DictKeys.SWING_MODES.value, None)
 
+            _temp_dict = {
+                f"{t}": deepcopy('') for t in range(self.__min_temp, self.__max_temp + 1, self.__precision_temp)
+            }
+            _swing_dict = None
+            if self.__swing_modes:
+                _swing_dict = {f"{s}": deepcopy(_temp_dict) for s in self.__swing_modes}
+            _fan_mode_dict = None
+            if self.__fan_modes:
+                if _swing_dict:
+                    _fan_mode_dict = {f"{f}": deepcopy(_swing_dict) for f in self.__fan_modes}
+                else:
+                    _fan_mode_dict = {f"{f}": deepcopy(_temp_dict) for f in self.__fan_modes}
+                _operation_dict = {f"{o}": deepcopy(_fan_mode_dict) for o in self.__op_modes}
+            else:
+                if _swing_dict:
+                    _operation_dict = {f"{o}": deepcopy(_swing_dict) for o in self.__op_modes}
+                else:
+                    _operation_dict = {f"{o}": deepcopy(_temp_dict) for o in self.__op_modes}
+            self.__smartir_dict[_DictKeys.COMMANDS].update(_operation_dict)
         except KeyError as key_err:
             raise click.exceptions.UsageError(f"Missing mandatory field in json file: {key_err}") from None
         else:
@@ -138,7 +158,15 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             self.__operation_mode = ''
             self.__fan_mode = ''
             self.__swing_mode = ''
-            self.__combination_arguments: tuple = ()
+
+    @property
+    def smartir_dict(self) -> dict:
+        """Output dictionary, for test purpose.
+
+        Returns:
+            dict: smartir compatible dictionary with learnt codes.
+        """
+        return self.__smartir_dict
 
     def _setup_combinations(self):
         _variable_args = [self.__fan_modes, self.__swing_modes]
