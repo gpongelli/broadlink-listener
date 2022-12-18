@@ -455,3 +455,22 @@ class TestSmartIR:
 
             _a.lear_all()
             assert _expected_dict == _a.smartir_dict
+
+    def test_no_code(self, json_file_good_data_op_mode):
+        """Test dict generation, operationMode only.
+
+        Arguments:
+            json_file_good_data_op_mode: json file
+        """
+        with patch('broadlink.remote.rmmini.enter_learning'), patch(
+            'broadlink.device.Device.auth', Mock(return_value=True)
+        ), patch('time.sleep'), patch(
+            'broadlink_listener.cli_tools.broadlink_manager.BroadlinkManager.learn_single_code', Mock(return_value=None)
+        ):
+            with pytest.raises(click.exceptions.UsageError):
+                _a = SmartIrManager(json_file_good_data_op_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678'))
+                _a.lear_all()
+
+            with pytest.raises(click.exceptions.UsageError):
+                _a = SmartIrManager(json_file_good_data_op_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678'))
+                _a.learn_off()
