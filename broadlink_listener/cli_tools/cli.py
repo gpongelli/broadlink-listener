@@ -90,8 +90,8 @@ def discover_ir(local_ip: str):
 @click.argument('dev_type', type=str, required=True)
 @click.argument('ip_addr', type=str, required=True)
 @click.argument('mac_addr', type=str, required=True)
-@click.option('--no-temp-on-mode', '-n', type=str, multiple=True)
-@click.option('--no-swing-on-mode', '-s', type=str, multiple=True)
+@click.option('--no-temp-on-mode', '-n', type=str, multiple=True, default=[])
+@click.option('--no-swing-on-mode', '-s', type=str, multiple=True, default=[])
 def generate_smart_ir(
     json_file: Path, dev_type: str, ip_addr: str, mac_addr: str, no_temp_on_mode: tuple, no_swing_on_mode: tuple
 ):  # pylint: disable=too-many-arguments, too-many-locals
