@@ -85,7 +85,7 @@ def _countdown(msg: str):
 class SmartIrManager:  # pylint: disable=too-many-instance-attributes
     """Manager class for SmartIR json."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-branches,too-many-statements
         self,
         file_name: Path,
         broadlink_mng: BroadlinkManager,
@@ -131,12 +131,23 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             self.__fan_modes = self.__smartir_dict.get(_DictKeys.FAN_MODES.value, None)
             self.__swing_modes = self.__smartir_dict.get(_DictKeys.SWING_MODES.value, None)
 
+            if not all(list(map(lambda x: x in self.__op_modes, no_swing_on_mode))):
+                raise click.exceptions.UsageError("no-swing-on-mode parameter is using a not-existent operating mode.")
+
+            if not all(list(map(lambda x: x in self.__op_modes, no_temp_on_mode))):
+                raise click.exceptions.UsageError("no-temp-on-mode parameter is using a not-existent operating mode.")
+
             _temp_dict = {
                 f"{t}": deepcopy('') for t in range(self.__min_temp, self.__max_temp + 1, self.__precision_temp)
             }
             _swing_dict = None
             if self.__swing_modes:
                 _swing_dict = {f"{s}": deepcopy(_temp_dict) for s in self.__swing_modes}
+            else:
+                if no_swing_on_mode:
+                    raise click.exceptions.UsageError(
+                        "Add swing to JSON file or do not use --no-swing-on-mode parameter."
+                    )
             _fan_mode_dict = None
             if self.__fan_modes:
                 if _swing_dict:
@@ -339,14 +350,14 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             raise click.exceptions.UsageError("No IR signal learnt for OFF command within timeout.")
         self.__smartir_dict[_DictKeys.COMMANDS.value]["off"] = _off
 
-    def lear_all(self):
+    def lear_all(self):  # pylint: disable=too-many-branches
         """Learn all the commands depending on calculated combination.
 
         Raises:
             UsageError: if no IR signal is learnt within timeout
         """
         _previous_code = None
-        for comb in self.__all_combinations:
+        for comb in self.__all_combinations:  # pylint: disable=too-many-nested-blocks
             self.operation_mode = comb.operationModes
             if _DictKeys.FAN_MODES in comb._fields:
                 self.fan_mode = comb.fanModes
@@ -366,8 +377,16 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
                 if _do_skip.field == _DictKeys.SWING_MODES:
                     _previous_code = self.__swing_saved_temp.get(self.temperature, None)
                     if _previous_code:
-                        self._set_dict_value(_previous_code)
-                        continue
+                        if isinstance(_previous_code, dict):
+                            # there also is the fan level saved
+                            _temp_code = _previous_code.get(self.fan_mode)
+                            if _temp_code:
+                                self._set_dict_value(_temp_code)
+                                continue
+                        else:
+                            # no fan
+                            self._set_dict_value(_previous_code)
+                            continue
 
             _combination_str = self._get_combination(comb)
             _countdown(
@@ -382,7 +401,10 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
 
             # swing modes must be saved because all temperature need to be listened
             if _do_skip.skip and _do_skip.field == _DictKeys.SWING_MODES:
-                self.__swing_saved_temp[self.temperature] = _code
+                if _DictKeys.FAN_MODES in comb._fields:
+                    self.__swing_saved_temp[self.temperature] = {self.fan_mode: _code}
+                else:
+                    self.__swing_saved_temp[self.temperature] = _code
 
             self._set_dict_value(_code)
         click.echo("All combination learnt.")

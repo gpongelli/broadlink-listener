@@ -456,6 +456,302 @@ class TestSmartIR:
             _a.lear_all()
             assert _expected_dict == _a.smartir_dict
 
+    def test_skip_temp(self, json_file_good_data_op_fan_swing_mode):
+        """Test dict generation, all fields.
+
+        Arguments:
+            json_file_good_data_op_fan_swing_mode: json file
+        """
+        _expected_values = ExpectedValues()
+        _expected_dict = dict_from_json(json_file_good_data_op_fan_swing_mode)
+
+        _expected_dict['commands'] = {
+            'off': _expected_dict['commands']['off'],
+            'cool': {
+                'low': {
+                    'up': {
+                        '18': _expected_values.expected_inc,
+                        '19': _expected_values.expected_dec,
+                        '20': _expected_values.expected_odd,
+                    },
+                    'down': {
+                        '18': _expected_values.expected_even,
+                        '19': _expected_values.expected_lower,
+                        '20': _expected_values.expected_upper,
+                    },
+                },
+                'high': {
+                    'up': {
+                        '18': _expected_values.expected_last,
+                        '19': _expected_values.expected_last_lower,
+                        '20': _expected_values.expected_inc,
+                    },
+                    'down': {
+                        '18': _expected_values.expected_dec,
+                        '19': _expected_values.expected_odd,
+                        '20': _expected_values.expected_even,
+                    },
+                },
+            },
+            'heat': {
+                'low': {
+                    'up': {
+                        '18': _expected_values.expected_lower,
+                        '19': _expected_values.expected_lower,
+                        '20': _expected_values.expected_lower,
+                    },
+                    'down': {
+                        '18': _expected_values.expected_upper,
+                        '19': _expected_values.expected_upper,
+                        '20': _expected_values.expected_upper,
+                    },
+                },
+                'high': {
+                    'up': {
+                        '18': _expected_values.expected_last,
+                        '19': _expected_values.expected_last,
+                        '20': _expected_values.expected_last,
+                    },
+                    'down': {
+                        '18': _expected_values.expected_last_lower,
+                        '19': _expected_values.expected_last_lower,
+                        '20': _expected_values.expected_last_lower,
+                    },
+                },
+            },
+        }
+
+        with patch('broadlink.remote.rmmini.enter_learning'), patch(
+            'broadlink.device.Device.auth', Mock(return_value=True)
+        ), patch('time.sleep'), patch(
+            'broadlink.remote.rmmini.check_data',
+            Mock(
+                side_effect=cycle(
+                    [
+                        _expected_values.code_inc,
+                        _expected_values.code_dec,
+                        _expected_values.code_odd,
+                        _expected_values.code_even,
+                        _expected_values.code_lower,
+                        _expected_values.code_upper,
+                        _expected_values.code_last,
+                        _expected_values.code_last_lower,
+                    ]
+                )
+            ),
+        ):
+            _a = SmartIrManager(
+                json_file_good_data_op_fan_swing_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678'), ('heat',)
+            )
+
+            _a.lear_all()
+            assert _expected_dict == _a.smartir_dict
+
+    def test_skip_swing(self, json_file_good_data_op_fan_swing_mode):
+        """Test dict generation, all fields.
+
+        Arguments:
+            json_file_good_data_op_fan_swing_mode: json file
+        """
+        _expected_values = ExpectedValues()
+        _expected_dict = dict_from_json(json_file_good_data_op_fan_swing_mode)
+
+        _expected_dict['commands'] = {
+            'off': _expected_dict['commands']['off'],
+            'cool': {
+                'low': {
+                    'up': {
+                        '18': _expected_values.expected_inc,
+                        '19': _expected_values.expected_dec,
+                        '20': _expected_values.expected_odd,
+                    },
+                    'down': {
+                        '18': _expected_values.expected_even,
+                        '19': _expected_values.expected_lower,
+                        '20': _expected_values.expected_upper,
+                    },
+                },
+                'high': {
+                    'up': {
+                        '18': _expected_values.expected_last,
+                        '19': _expected_values.expected_last_lower,
+                        '20': _expected_values.expected_inc,
+                    },
+                    'down': {
+                        '18': _expected_values.expected_dec,
+                        '19': _expected_values.expected_odd,
+                        '20': _expected_values.expected_even,
+                    },
+                },
+            },
+            'heat': {
+                'low': {
+                    'up': {
+                        '18': _expected_values.expected_lower,
+                        '19': _expected_values.expected_upper,
+                        '20': _expected_values.expected_last,
+                    },
+                    'down': {
+                        '18': _expected_values.expected_lower,
+                        '19': _expected_values.expected_upper,
+                        '20': _expected_values.expected_last,
+                    },
+                },
+                'high': {
+                    'up': {
+                        '18': _expected_values.expected_last_lower,
+                        '19': _expected_values.expected_inc,
+                        '20': _expected_values.expected_dec,
+                    },
+                    'down': {
+                        '18': _expected_values.expected_last_lower,
+                        '19': _expected_values.expected_inc,
+                        '20': _expected_values.expected_dec,
+                    },
+                },
+            },
+        }
+
+        with patch('broadlink.remote.rmmini.enter_learning'), patch(
+            'broadlink.device.Device.auth', Mock(return_value=True)
+        ), patch('time.sleep'), patch(
+            'broadlink.remote.rmmini.check_data',
+            Mock(
+                side_effect=cycle(
+                    [
+                        _expected_values.code_inc,
+                        _expected_values.code_dec,
+                        _expected_values.code_odd,
+                        _expected_values.code_even,
+                        _expected_values.code_lower,
+                        _expected_values.code_upper,
+                        _expected_values.code_last,
+                        _expected_values.code_last_lower,
+                    ]
+                )
+            ),
+        ):
+            _a = SmartIrManager(
+                json_file_good_data_op_fan_swing_mode,
+                BroadlinkManager('0x51DA', '192.168.1.1', '12345678'),
+                (),
+                ('heat',),
+            )
+
+            _a.lear_all()
+            assert _expected_dict == _a.smartir_dict
+
+    def test_skip_swing_no_fan_mode(self, json_file_good_data_op_swing_mode):
+        """Test dict generation, all fields.
+
+        Arguments:
+            json_file_good_data_op_swing_mode: json file
+        """
+        _expected_values = ExpectedValues()
+        _expected_dict = dict_from_json(json_file_good_data_op_swing_mode)
+
+        _expected_dict['commands'] = {
+            'off': _expected_dict['commands']['off'],
+            'cool': {
+                'up': {
+                    '18': _expected_values.expected_inc,
+                    '19': _expected_values.expected_dec,
+                    '20': _expected_values.expected_odd,
+                },
+                'down': {
+                    '18': _expected_values.expected_even,
+                    '19': _expected_values.expected_lower,
+                    '20': _expected_values.expected_upper,
+                },
+            },
+            'heat': {
+                'up': {
+                    '18': _expected_values.expected_last,
+                    '19': _expected_values.expected_last_lower,
+                    '20': _expected_values.expected_inc,
+                },
+                'down': {
+                    '18': _expected_values.expected_last,
+                    '19': _expected_values.expected_last_lower,
+                    '20': _expected_values.expected_inc,
+                },
+            },
+        }
+
+        with patch('broadlink.remote.rmmini.enter_learning'), patch(
+            'broadlink.device.Device.auth', Mock(return_value=True)
+        ), patch('time.sleep'), patch(
+            'broadlink.remote.rmmini.check_data',
+            Mock(
+                side_effect=cycle(
+                    [
+                        _expected_values.code_inc,
+                        _expected_values.code_dec,
+                        _expected_values.code_odd,
+                        _expected_values.code_even,
+                        _expected_values.code_lower,
+                        _expected_values.code_upper,
+                        _expected_values.code_last,
+                        _expected_values.code_last_lower,
+                    ]
+                )
+            ),
+        ):
+            _a = SmartIrManager(
+                json_file_good_data_op_swing_mode,
+                BroadlinkManager('0x51DA', '192.168.1.1', '12345678'),
+                (),
+                ('heat',),
+            )
+
+            _a.lear_all()
+            assert _expected_dict == _a.smartir_dict
+
+    def test_skip_swing_cli_param(self, json_file_good_data_op_fan_mode):
+        """Test dict generation, all fields.
+
+        Arguments:
+            json_file_good_data_op_fan_mode: json file without swing
+        """
+        with patch('broadlink.device.Device.auth', Mock(return_value=True)):
+            with pytest.raises(click.exceptions.UsageError):
+                _ = SmartIrManager(
+                    json_file_good_data_op_fan_mode,
+                    BroadlinkManager('0x51DA', '192.168.1.1', '12345678'),
+                    (),
+                    ('heat',),
+                )
+
+    def test_mode_not_present_from_swing(self, json_file_good_data_op_fan_swing_mode):
+        """Test dict generation, all fields.
+
+        Arguments:
+            json_file_good_data_op_fan_swing_mode: json file
+        """
+        with patch('broadlink.device.Device.auth', Mock(return_value=True)):
+            with pytest.raises(click.exceptions.UsageError):
+                _ = SmartIrManager(
+                    json_file_good_data_op_fan_swing_mode,
+                    BroadlinkManager('0x51DA', '192.168.1.1', '12345678'),
+                    (),
+                    ('hesat',),
+                )
+
+    def test_mode_not_present_from_temp(self, json_file_good_data_op_fan_swing_mode):
+        """Test dict generation, all fields.
+
+        Arguments:
+            json_file_good_data_op_fan_swing_mode: json file
+        """
+        with patch('broadlink.device.Device.auth', Mock(return_value=True)):
+            with pytest.raises(click.exceptions.UsageError):
+                _ = SmartIrManager(
+                    json_file_good_data_op_fan_swing_mode,
+                    BroadlinkManager('0x51DA', '192.168.1.1', '12345678'),
+                    ('hesat',),
+                    (),
+                )
+
     def test_no_code(self, json_file_good_data_op_mode):
         """Test dict generation, operationMode only.
 
