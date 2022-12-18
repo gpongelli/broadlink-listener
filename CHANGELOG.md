@@ -1,3 +1,21 @@
+## 1.0.0 (2022-12-18)
+
+### Feat
+
+- tests on skip field execution
+- test no code learnt case
+- increate test complexity
+- new tests with all json combinations
+- license managed with tox env
+- empty default tuple
+- new tests
+- refact skipped combination, added print
+- util tests
+
+### Fix
+
+- create section for final json
+
 ## 0.2.0 (2022-12-09)
 
 ### Feat
