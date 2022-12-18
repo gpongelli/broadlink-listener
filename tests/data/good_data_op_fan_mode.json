@@ -3,7 +3,7 @@
   "commandsEncoding": "Base64",
   "supportedController": "Broadlink",
   "minTemperature": 18,
-  "maxTemperature": 19,
+  "maxTemperature": 20,
   "precision": 1,
   "operationModes": [
     "cool",

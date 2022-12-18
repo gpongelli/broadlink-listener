@@ -64,10 +64,10 @@ class TestBroadlinkManager:
         """Test rmmini device learn mode, exception case will retrieve None ."""
         _expected = None
 
-        with patch('broadlink.remote.rmmini.enter_learning'), patch('time.sleep'), patch(
-            'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('broadlink.remote.rmmini.check_data', Mock(side_effect=ReadError(-10))), patch(
-            'broadlink.const.DEFAULT_TIMEOUT', Mock(return_value=1)
+        with patch('time.sleep'), patch('broadlink_listener.cli_tools.broadlink_manager.DEFAULT_TIMEOUT', 1), patch(
+            'broadlink.remote.rmmini.enter_learning'
+        ), patch('broadlink.device.Device.auth', Mock(return_value=True)), patch(
+            'broadlink.remote.rmmini.check_data', Mock(side_effect=ReadError(-10))
         ):
 
             _a = BroadlinkManager('0x51DA', '192.168.1.1', '12345678')

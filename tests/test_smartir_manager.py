@@ -4,14 +4,14 @@
 
 """Test smartir manager module."""
 
-import binascii
-import json
+from itertools import cycle
 from unittest.mock import Mock, patch
 
 import click
 import pytest
 
 from broadlink_listener.cli_tools.smartir_manager import BroadlinkManager, SmartIrManager
+from tests.conftest import ExpectedValues, dict_from_json
 
 
 class TestSmartIR:
@@ -68,11 +68,8 @@ class TestSmartIR:
         Arguments:
             json_file_good_data_op_mode: json file
         """
-        _code_value = b'12345678'
-        b64_data = binascii.b2a_base64(_code_value, newline=False)
-        _expected = b64_data.decode('utf-8')
-        with open(str(json_file_good_data_op_mode), "r", encoding='utf-8') as in_file:
-            _expected_dict = json.load(in_file)
+        _expected_values = ExpectedValues()
+        _expected_dict = dict_from_json(json_file_good_data_op_mode)
 
         _expect_dict_before_learn = dict(_expected_dict)
         _expect_dict_before_learn['commands'] = {
@@ -92,20 +89,34 @@ class TestSmartIR:
         _expected_dict['commands'] = {
             'off': _expected_dict['commands']['off'],
             'cool': {
-                '18': _expected,
-                '19': _expected,
-                '20': _expected,
+                '18': _expected_values.expected_inc,
+                '19': _expected_values.expected_dec,
+                '20': _expected_values.expected_odd,
             },
             'heat': {
-                '18': _expected,
-                '19': _expected,
-                '20': _expected,
+                '18': _expected_values.expected_even,
+                '19': _expected_values.expected_lower,
+                '20': _expected_values.expected_upper,
             },
         }
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
             'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('time.sleep'), patch('broadlink.remote.rmmini.check_data', Mock(return_value=_code_value)):
+        ), patch('time.sleep'), patch(
+            'broadlink.remote.rmmini.check_data',
+            Mock(
+                side_effect=cycle(
+                    [
+                        _expected_values.code_inc,
+                        _expected_values.code_dec,
+                        _expected_values.code_odd,
+                        _expected_values.code_even,
+                        _expected_values.code_lower,
+                        _expected_values.code_upper,
+                    ]
+                )
+            ),
+        ):
             _a = SmartIrManager(json_file_good_data_op_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678'))
             assert _expect_dict_before_learn == _a.smartir_dict
 
@@ -118,11 +129,8 @@ class TestSmartIR:
         Arguments:
             json_file_good_data_op_fan_mode: json file
         """
-        _code_value = b'12345678'
-        b64_data = binascii.b2a_base64(_code_value, newline=False)
-        _expected = b64_data.decode('utf-8')
-        with open(str(json_file_good_data_op_fan_mode), "r", encoding='utf-8') as in_file:
-            _expected_dict = json.load(in_file)
+        _expected_values = ExpectedValues()
+        _expected_dict = dict_from_json(json_file_good_data_op_fan_mode)
 
         _expect_dict_before_learn = dict(_expected_dict)
         _expect_dict_before_learn['commands'] = {
@@ -131,20 +139,24 @@ class TestSmartIR:
                 'low': {
                     '18': '',
                     '19': '',
+                    '20': '',
                 },
                 'high': {
                     '18': '',
                     '19': '',
+                    '20': '',
                 },
             },
             'heat': {
                 'low': {
                     '18': '',
                     '19': '',
+                    '20': '',
                 },
                 'high': {
                     '18': '',
                     '19': '',
+                    '20': '',
                 },
             },
         }
@@ -153,29 +165,49 @@ class TestSmartIR:
             'off': _expected_dict['commands']['off'],
             'cool': {
                 'low': {
-                    '18': _expected,
-                    '19': _expected,
+                    '18': _expected_values.expected_inc,
+                    '19': _expected_values.expected_dec,
+                    '20': _expected_values.expected_odd,
                 },
                 'high': {
-                    '18': _expected,
-                    '19': _expected,
+                    '18': _expected_values.expected_even,
+                    '19': _expected_values.expected_lower,
+                    '20': _expected_values.expected_upper,
                 },
             },
             'heat': {
                 'low': {
-                    '18': _expected,
-                    '19': _expected,
+                    '18': _expected_values.expected_last,
+                    '19': _expected_values.expected_last_lower,
+                    '20': _expected_values.expected_inc,
                 },
                 'high': {
-                    '18': _expected,
-                    '19': _expected,
+                    '18': _expected_values.expected_dec,
+                    '19': _expected_values.expected_odd,
+                    '20': _expected_values.expected_even,
                 },
             },
         }
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
             'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('time.sleep'), patch('broadlink.remote.rmmini.check_data', Mock(return_value=_code_value)):
+        ), patch('time.sleep'), patch(
+            'broadlink.remote.rmmini.check_data',
+            Mock(
+                side_effect=cycle(
+                    [
+                        _expected_values.code_inc,
+                        _expected_values.code_dec,
+                        _expected_values.code_odd,
+                        _expected_values.code_even,
+                        _expected_values.code_lower,
+                        _expected_values.code_upper,
+                        _expected_values.code_last,
+                        _expected_values.code_last_lower,
+                    ]
+                )
+            ),
+        ):
             _a = SmartIrManager(json_file_good_data_op_fan_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678'))
             assert _expect_dict_before_learn == _a.smartir_dict
 
@@ -188,11 +220,8 @@ class TestSmartIR:
         Arguments:
             json_file_good_data_op_swing_mode: json file
         """
-        _code_value = b'12345678'
-        b64_data = binascii.b2a_base64(_code_value, newline=False)
-        _expected = b64_data.decode('utf-8')
-        with open(str(json_file_good_data_op_swing_mode), "r", encoding='utf-8') as in_file:
-            _expected_dict = json.load(in_file)
+        _expected_values = ExpectedValues()
+        _expected_dict = dict_from_json(json_file_good_data_op_swing_mode)
 
         _expect_dict_before_learn = dict(_expected_dict)
         _expect_dict_before_learn['commands'] = {
@@ -201,20 +230,24 @@ class TestSmartIR:
                 'up': {
                     '18': '',
                     '19': '',
+                    '20': '',
                 },
                 'down': {
                     '18': '',
                     '19': '',
+                    '20': '',
                 },
             },
             'heat': {
                 'up': {
                     '18': '',
                     '19': '',
+                    '20': '',
                 },
                 'down': {
                     '18': '',
                     '19': '',
+                    '20': '',
                 },
             },
         }
@@ -223,29 +256,49 @@ class TestSmartIR:
             'off': _expected_dict['commands']['off'],
             'cool': {
                 'up': {
-                    '18': _expected,
-                    '19': _expected,
+                    '18': _expected_values.expected_inc,
+                    '19': _expected_values.expected_dec,
+                    '20': _expected_values.expected_odd,
                 },
                 'down': {
-                    '18': _expected,
-                    '19': _expected,
+                    '18': _expected_values.expected_even,
+                    '19': _expected_values.expected_lower,
+                    '20': _expected_values.expected_upper,
                 },
             },
             'heat': {
                 'up': {
-                    '18': _expected,
-                    '19': _expected,
+                    '18': _expected_values.expected_last,
+                    '19': _expected_values.expected_last_lower,
+                    '20': _expected_values.expected_inc,
                 },
                 'down': {
-                    '18': _expected,
-                    '19': _expected,
+                    '18': _expected_values.expected_dec,
+                    '19': _expected_values.expected_odd,
+                    '20': _expected_values.expected_even,
                 },
             },
         }
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
             'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('time.sleep'), patch('broadlink.remote.rmmini.check_data', Mock(return_value=_code_value)):
+        ), patch('time.sleep'), patch(
+            'broadlink.remote.rmmini.check_data',
+            Mock(
+                side_effect=cycle(
+                    [
+                        _expected_values.code_inc,
+                        _expected_values.code_dec,
+                        _expected_values.code_odd,
+                        _expected_values.code_even,
+                        _expected_values.code_lower,
+                        _expected_values.code_upper,
+                        _expected_values.code_last,
+                        _expected_values.code_last_lower,
+                    ]
+                )
+            ),
+        ):
             _a = SmartIrManager(
                 json_file_good_data_op_swing_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
             )
@@ -260,11 +313,8 @@ class TestSmartIR:
         Arguments:
             json_file_good_data_op_fan_swing_mode: json file
         """
-        _code_value = b'12345678'
-        b64_data = binascii.b2a_base64(_code_value, newline=False)
-        _expected = b64_data.decode('utf-8')
-        with open(str(json_file_good_data_op_fan_swing_mode), "r", encoding='utf-8') as in_file:
-            _expected_dict = json.load(in_file)
+        _expected_values = ExpectedValues()
+        _expected_dict = dict_from_json(json_file_good_data_op_fan_swing_mode)
 
         _expect_dict_before_learn = dict(_expected_dict)
         _expect_dict_before_learn['commands'] = {
@@ -274,20 +324,24 @@ class TestSmartIR:
                     'up': {
                         '18': '',
                         '19': '',
+                        '20': '',
                     },
                     'down': {
                         '18': '',
                         '19': '',
+                        '20': '',
                     },
                 },
                 'high': {
                     'up': {
                         '18': '',
                         '19': '',
+                        '20': '',
                     },
                     'down': {
                         '18': '',
                         '19': '',
+                        '20': '',
                     },
                 },
             },
@@ -296,20 +350,24 @@ class TestSmartIR:
                     'up': {
                         '18': '',
                         '19': '',
+                        '20': '',
                     },
                     'down': {
                         '18': '',
                         '19': '',
+                        '20': '',
                     },
                 },
                 'high': {
                     'up': {
                         '18': '',
                         '19': '',
+                        '20': '',
                     },
                     'down': {
                         '18': '',
                         '19': '',
+                        '20': '',
                     },
                 },
             },
@@ -320,44 +378,52 @@ class TestSmartIR:
             'cool': {
                 'low': {
                     'up': {
-                        '18': _expected,
-                        '19': _expected,
+                        '18': _expected_values.expected_inc,
+                        '19': _expected_values.expected_dec,
+                        '20': _expected_values.expected_odd,
                     },
                     'down': {
-                        '18': _expected,
-                        '19': _expected,
+                        '18': _expected_values.expected_even,
+                        '19': _expected_values.expected_lower,
+                        '20': _expected_values.expected_upper,
                     },
                 },
                 'high': {
                     'up': {
-                        '18': _expected,
-                        '19': _expected,
+                        '18': _expected_values.expected_last,
+                        '19': _expected_values.expected_last_lower,
+                        '20': _expected_values.expected_inc,
                     },
                     'down': {
-                        '18': _expected,
-                        '19': _expected,
+                        '18': _expected_values.expected_dec,
+                        '19': _expected_values.expected_odd,
+                        '20': _expected_values.expected_even,
                     },
                 },
             },
             'heat': {
                 'low': {
                     'up': {
-                        '18': _expected,
-                        '19': _expected,
+                        '18': _expected_values.expected_lower,
+                        '19': _expected_values.expected_upper,
+                        '20': _expected_values.expected_last,
                     },
                     'down': {
-                        '18': _expected,
-                        '19': _expected,
+                        '18': _expected_values.expected_last_lower,
+                        '19': _expected_values.expected_inc,
+                        '20': _expected_values.expected_dec,
                     },
                 },
                 'high': {
                     'up': {
-                        '18': _expected,
-                        '19': _expected,
+                        '18': _expected_values.expected_odd,
+                        '19': _expected_values.expected_even,
+                        '20': _expected_values.expected_lower,
                     },
                     'down': {
-                        '18': _expected,
-                        '19': _expected,
+                        '18': _expected_values.expected_upper,
+                        '19': _expected_values.expected_last,
+                        '20': _expected_values.expected_last_lower,
                     },
                 },
             },
@@ -365,7 +431,23 @@ class TestSmartIR:
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
             'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('time.sleep'), patch('broadlink.remote.rmmini.check_data', Mock(return_value=_code_value)):
+        ), patch('time.sleep'), patch(
+            'broadlink.remote.rmmini.check_data',
+            Mock(
+                side_effect=cycle(
+                    [
+                        _expected_values.code_inc,
+                        _expected_values.code_dec,
+                        _expected_values.code_odd,
+                        _expected_values.code_even,
+                        _expected_values.code_lower,
+                        _expected_values.code_upper,
+                        _expected_values.code_last,
+                        _expected_values.code_last_lower,
+                    ]
+                )
+            ),
+        ):
             _a = SmartIrManager(
                 json_file_good_data_op_fan_swing_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
             )
