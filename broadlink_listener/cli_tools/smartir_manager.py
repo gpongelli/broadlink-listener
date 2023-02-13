@@ -5,7 +5,6 @@
 """SmartIR json manager class."""
 
 import json
-import time
 from collections import namedtuple
 from copy import deepcopy
 from dataclasses import dataclass
@@ -75,11 +74,10 @@ _CombinationTupleFan = namedtuple('_CombinationTupleFan', ', '.join(_combination
 _CombinationTupleNone = namedtuple('_CombinationTupleNone', ', '.join(_combination_arguments_none))  # type: ignore
 
 
-def _countdown(msg: str):
+def _countdown(msg: str, manual_wait: bool):
     click.echo(msg)
-    for i in range(5, 0, -1):
-        click.echo(i)
-        time.sleep(1)
+    if manual_wait:
+        input("-->> Press enter when ready <<--")
 
 
 class SmartIrManager:  # pylint: disable=too-many-instance-attributes
@@ -107,6 +105,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         """
         self.__broadlink_manager = broadlink_mng
 
+        self.__partial_inc = 0
         self.__json_file_name = file_name
         with open(str(file_name), "r", encoding='utf-8') as in_file:
             self.__smartir_dict = json.load(in_file)
@@ -329,11 +328,19 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         """Save modified dict to output json file."""
         now = datetime.now()
         _modified_file_name = Path(self.__json_file_name.parent).joinpath(
-            f'{self.__json_file_name.stem}_' f'{now.strftime("%Y%m%d_%H%M%S")}.json'
+            f'{self.__json_file_name.stem}_{now.strftime("%Y%m%d_%H%M%S")}.json'
         )
         with open(_modified_file_name, 'w', encoding='utf-8') as out_file:
             json.dump(self.__smartir_dict, out_file)
         click.echo(f"Created new file {_modified_file_name}")
+
+    def _save_partial_dict(self):
+        _modified_file_name = Path(self.__json_file_name.parent).joinpath(
+            f'{self.__json_file_name.stem}_{self.__partial_inc}.json'
+        )
+        with open(_modified_file_name, 'w', encoding='utf-8') as out_file:
+            json.dump(self.__smartir_dict[_DictKeys.COMMANDS.value], out_file)
+        self.__partial_inc += 1
 
     def learn_off(self):
         """Learn OFF command that's outside the combination.
@@ -343,7 +350,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         """
         _countdown(
             "First of all, let's learn OFF command: turn ON the remote and then turn it OFF when "
-            "'Listening' message is on screen..."
+            "'Listening' message is on screen...", False
         )
         _off = self.__broadlink_manager.learn_single_code()
         if not _off:
@@ -357,6 +364,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             UsageError: if no IR signal is learnt within timeout
         """
         _previous_code = None
+        _previous_combination = None
         for comb in self.__all_combinations:  # pylint: disable=too-many-nested-blocks
             self.operation_mode = comb.operationModes
             if _DictKeys.FAN_MODES in comb._fields:
@@ -388,11 +396,21 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
                             self._set_dict_value(_previous_code)
                             continue
 
+            _manual_wait = False
+            if _previous_combination:
+                for i in range(0, len(comb)-1):
+                    if _previous_combination[i] != comb[i]:
+                        _manual_wait = True
+                        self._save_partial_dict()
+            _previous_combination = comb
+
             _combination_str = self._get_combination(comb)
             _countdown(
-                f"Let's learn command of\n{_combination_str}\n"
-                "Prepare the remote to this combination, then turn it OFF. When 'Listening' message"
-                " is on screen, turn the remote ON to learn combination previously set..."
+                "-" * 30 +
+                f"\nLet's learn IR command of\n{_combination_str}\n"
+                "Prepare the remote so Broadlink can listen the above combination when 'Listening' message"
+                " is on screen...",
+                _manual_wait
             )
             _code = self.__broadlink_manager.learn_single_code()
             _previous_code = _code
