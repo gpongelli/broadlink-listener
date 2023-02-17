@@ -336,11 +336,18 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
 
     def _save_partial_dict(self):
         _modified_file_name = Path(self.__json_file_name.parent).joinpath(
-            f'{self.__json_file_name.stem}_{self.__partial_inc}.json'
+            f'{self.__json_file_name.stem}_tmp_{self.__partial_inc}.json'
         )
-        with open(_modified_file_name, 'w', encoding='utf-8') as out_file:
-            json.dump(self.__smartir_dict[_DictKeys.COMMANDS.value], out_file)
-        self.__partial_inc += 1
+
+        try:
+            _no_off = deepcopy(self.__smartir_dict)
+            del _no_off['commands']['off']
+        except KeyError:
+            return
+        else:
+            with open(_modified_file_name, 'w', encoding='utf-8') as out_file:
+                json.dump(_no_off[_DictKeys.COMMANDS.value], out_file, indent=2)
+            self.__partial_inc += 1
 
     def learn_off(self):
         """Learn OFF command that's outside the combination.
