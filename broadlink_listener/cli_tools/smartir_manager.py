@@ -4,7 +4,9 @@
 
 """SmartIR json manager class."""
 
+import glob
 import json
+import os
 from collections import namedtuple
 from copy import deepcopy
 from dataclasses import dataclass
@@ -136,6 +138,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             if not all(list(map(lambda x: x in self.__op_modes, no_temp_on_mode))):
                 raise click.exceptions.UsageError("no-temp-on-mode parameter is using a not-existent operating mode.")
 
+            # fill dict with all empty combination
             _temp_dict = {
                 f"{t}": deepcopy('') for t in range(self.__min_temp, self.__max_temp + 1, self.__precision_temp)
             }
@@ -160,6 +163,10 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
                 else:
                     _operation_dict = {f"{o}": deepcopy(_temp_dict) for o in self.__op_modes}  # type: ignore
             self.__smartir_dict[_DictKeys.COMMANDS].update(_operation_dict)
+
+            # overwrite combination if tmp file exist
+            self._load_partial_dict()
+
         except KeyError as key_err:
             raise click.exceptions.UsageError(f"Missing mandatory field in json file: {key_err}") from None
         else:
@@ -335,8 +342,9 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         click.echo(f"Created new file {_modified_file_name}")
 
     def _save_partial_dict(self):
+         # save with incremental 3 numbers to sort correctly when load
         _modified_file_name = Path(self.__json_file_name.parent).joinpath(
-            f'{self.__json_file_name.stem}_tmp_{self.__partial_inc}.json'
+            f'{self.__json_file_name.stem}_tmp_{self.__partial_inc:03}.json'
         )
 
         try:
@@ -348,6 +356,16 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             with open(_modified_file_name, 'w', encoding='utf-8') as out_file:
                 json.dump(_no_off[_DictKeys.COMMANDS.value], out_file, indent=2)
             self.__partial_inc += 1
+
+    def _load_partial_dict(self):
+        _previous = glob.glob(os.path.join(self.__json_file_name.parent, f'{self.__json_file_name.stem}_tmp_*.json'))
+        _previous.sort()
+        try:
+            # load last file that's the most updated
+            with open(str(_previous[-1]), "r", encoding='utf-8') as partial_file:
+                self.__smartir_dict[_DictKeys.COMMANDS.value].update(json.load(partial_file))
+        except IndexError:
+            pass
 
     def learn_off(self):
         """Learn OFF command that's outside the combination.
@@ -364,7 +382,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             raise click.exceptions.UsageError("No IR signal learnt for OFF command within timeout.")
         self.__smartir_dict[_DictKeys.COMMANDS.value]["off"] = _off
 
-    def lear_all(self):  # pylint: disable=too-many-branches
+    def learn_all(self):  # pylint: disable=too-many-branches
         """Learn all the commands depending on calculated combination.
 
         Raises:

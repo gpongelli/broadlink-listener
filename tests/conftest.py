@@ -5,12 +5,21 @@
 """Pytest conftest."""
 
 import binascii
+import glob
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
+
+
+def _remove_tmp_files():
+    """Utility method to remove all tmp files."""
+    _previous = glob.glob(os.path.join(Path.cwd().joinpath("tests").joinpath("data"), f'*_tmp_*.json'))
+    for _file in _previous:
+        os.remove(_file)
 
 
 @pytest.fixture
@@ -60,7 +69,8 @@ def json_file_good_data_op_mode() -> Path:
     Returns:
         json's path file
     """
-    return Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_mode.json")
+    yield Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_mode.json")
+    _remove_tmp_files()
 
 
 @pytest.fixture
@@ -70,7 +80,8 @@ def json_file_good_data_op_fan_mode() -> Path:
     Returns:
         json's path file
     """
-    return Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_fan_mode.json")
+    yield Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_fan_mode.json")
+    _remove_tmp_files()
 
 
 @pytest.fixture
@@ -80,7 +91,8 @@ def json_file_good_data_op_fan_swing_mode() -> Path:
     Returns:
         json's path file
     """
-    return Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_fan_swing_mode.json")
+    yield Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_fan_swing_mode.json")
+    _remove_tmp_files()
 
 
 @pytest.fixture
@@ -90,7 +102,47 @@ def json_file_good_data_op_swing_mode() -> Path:
     Returns:
         json's path file
     """
-    return Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_swing_mode.json")
+    yield Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_swing_mode.json")
+    _remove_tmp_files()
+
+@pytest.fixture
+def json_file_partial_dict_op_fan_swing_mode() -> Path:
+    """Return json test file with good structure for partial load.
+
+    Returns:
+        json's path file
+    """
+    return Path.cwd().joinpath("tests").joinpath("partial_dicts").joinpath("good_data_op_fan_swing_mode.json")
+
+
+@pytest.fixture
+def json_file_previous_partial_dict_op_fan_swing_mode() -> Path:
+    """Return json test file with good structure for partial load.
+
+    Returns:
+        json's path file
+    """
+    return Path.cwd().joinpath("tests").joinpath("partial_dicts").joinpath("good_data_op_fan_swing_mode_tmp_003.json")
+
+
+@pytest.fixture
+def json_file_partial_dict_op_swing_mode() -> Path:
+    """Return json test file with good structure for partial load.
+
+    Returns:
+        json's path file
+    """
+    return Path.cwd().joinpath("tests").joinpath("partial_dicts").joinpath("good_data_op_swing_mode.json")
+
+
+@pytest.fixture
+def json_file_last_previous_partial_dict_op_swing_mode() -> Path:
+    """Return json test file with good structure for partial load.
+
+    Returns:
+        json's path file
+    """
+    return Path.cwd().joinpath("tests").joinpath("partial_dicts").joinpath("good_data_op_swing_mode_tmp_003.json")
 
 
 @pytest.fixture

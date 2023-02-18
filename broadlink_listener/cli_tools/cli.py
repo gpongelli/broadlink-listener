@@ -111,7 +111,7 @@ def generate_smart_ir(
     smart_ir_mng = SmartIrManager(json_file, broadlink_mng, no_temp_on_mode, no_swing_on_mode)
 
     smart_ir_mng.learn_off()
-    smart_ir_mng.lear_all()
+    smart_ir_mng.learn_all()
     smart_ir_mng.save_dict()
 
 
