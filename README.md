@@ -127,8 +127,39 @@ listening state, until all IR code combination will being scan.
 * Optional fields (at least one must be present or nothing will be listened):
   * `operationModes`, `fanModes`,`swingModes`
 * Generated file can be used into SmartIR HomeAssistant component
+* It's possible to interrupt with CTRL-C at any moment, a temporary file will be saved
+* Temporary files are also saved at the end of each temperature range
+* In case of existing temporary file, the already learnt combination will be skipped
+
+
+## Example
+
+Example of cli command:
+```bash
+$ broadlink-listener generate-smart-ir ./real_data/1124.json <DEVICE_TYPE> <IP> <MAC_ADDR> -n dry -n fan_only -s eco_cool
+```
+
+`real_data/1124.json` file is [this one from SmartIR GitHub repo](https://github.com/smartHomeHub/SmartIR/blob/master/codes/climate/1124.json)
+in which I've added the missing "swingModes" array, supported by climate but not present on json:
+```json
+"swingModes": [
+  "auto",
+  "high",
+  "mid_high",
+  "middle",
+  "mid_low",
+  "low",
+  "swing"
+],
+```
+
+`<DEVICE_TYPE>`, `<IP>`, `<MAC_ADDR>` parameter can be obtained running:
+```bash
+$ broadlink-listener discover_ir
+```
 
 
 ## Credits
 
-This package was created with [Cookiecutter](https://github.com/audreyr/cookiecutter) and the [gpongelli/cookiecutter-pypackage](https://github.com/gpongelli/cookiecutter-pypackage) project template.
+This package was created with [Cookiecutter](https://github.com/audreyr/cookiecutter)
+and the [gpongelli/cookiecutter-pypackage](https://github.com/gpongelli/cookiecutter-pypackage) project template.
