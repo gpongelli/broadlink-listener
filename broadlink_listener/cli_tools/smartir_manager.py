@@ -15,6 +15,7 @@ from datetime import datetime
 from enum import Enum
 from itertools import product
 from pathlib import Path
+from threading import Event
 from typing import Literal, Optional, Union
 
 import click
@@ -77,10 +78,11 @@ _CombinationTupleFan = namedtuple('_CombinationTupleFan', ', '.join(_combination
 _CombinationTupleNone = namedtuple('_CombinationTupleNone', ', '.join(_combination_arguments_none))  # type: ignore
 
 
-def _countdown(msg: str, manual_wait: bool):
+def _countdown(msg: str, event: Event):
     click.echo(msg)
-    if manual_wait:
+    if event.is_set():
         input("-->> Press enter when ready <<--")
+    event.clear()
 
 
 class SmartIrManager:  # pylint: disable=too-many-instance-attributes
@@ -109,6 +111,8 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         self.__broadlink_manager = broadlink_mng
 
         self.__partial_inc = 0
+        self.__prompt_event = Event()
+        self.__prompt_event.clear()
         self.__json_file_name_path = Path(file_name)
         with open(str(file_name), "r", encoding='utf-8') as in_file:
             self.__smartir_dict = json.load(in_file)
@@ -414,11 +418,14 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         Raises:
             UsageError: if no IR signal is learnt within timeout
         """
+        self.__prompt_event.clear()
         _countdown(
             "First of all, let's learn OFF command: turn ON the remote and then turn it OFF when "
             "'Listening' message is on screen...",
-            False,
+            self.__prompt_event,
         )
+        # set event to wait for first code
+        self.__prompt_event.set()
         _off = self.__broadlink_manager.learn_single_code()
         if not _off:
             raise click.exceptions.UsageError("No IR signal learnt for OFF command within timeout.")
@@ -432,7 +439,6 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         """
         _previous_code = None
         _previous_combination: Optional[tuple] = None
-        _loaded_codes = False
         for comb in self.__all_combinations:  # pylint: disable=too-many-nested-blocks
             self.operation_mode = comb.operationModes
             if _DictKeys.FAN_MODES in comb._fields:
@@ -442,7 +448,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             self.temperature = str(comb.temperature)
 
             if self._get_dict_value() != '':
-                _loaded_codes = True
+                self.__prompt_event.set()
                 continue
 
             _do_skip = self._skip_learning(comb)
@@ -468,11 +474,10 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
                             self._set_dict_value(_previous_code)
                             continue
 
-            _manual_wait = False
             if _previous_combination:
                 for i in range(0, len(comb) - 1):
                     if _previous_combination[i] != comb[i]:  # pylint: disable=unsubscriptable-object
-                        _manual_wait = True
+                        self.__prompt_event.set()
                         self._save_partial_dict()
             _previous_combination = comb
 
@@ -481,7 +486,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
                 "-" * 30 + f"\nLet's learn IR command of\n{_combination_str}\n"
                 "Prepare the remote so Broadlink can listen the above combination when 'Listening' message"
                 " is on screen...",
-                _manual_wait or _loaded_codes,
+                self.__prompt_event,
             )
             _code = self.__broadlink_manager.learn_single_code()
             _previous_code = _code
