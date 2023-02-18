@@ -337,6 +337,24 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             else:
                 self.__smartir_dict[_DictKeys.COMMANDS.value][self.operation_mode][self.temperature] = value
 
+    def _get_dict_value(self) -> str:
+        _value = ''
+        if _DictKeys.FAN_MODES in self.__combination_arguments:
+            if _DictKeys.SWING_MODES in self.__combination_arguments:
+                _value = self.__smartir_dict[_DictKeys.COMMANDS.value][self.operation_mode][self.fan_mode][self.swing_mode][self.temperature]
+            else:
+                _value = self.__smartir_dict[_DictKeys.COMMANDS.value][self.operation_mode][self.fan_mode][
+                    self.temperature
+                ]
+        else:
+            if _DictKeys.SWING_MODES in self.__combination_arguments:
+                _value = self.__smartir_dict[_DictKeys.COMMANDS.value][self.operation_mode][self.swing_mode][
+                    self.temperature
+                ]
+            else:
+                _value = self.__smartir_dict[_DictKeys.COMMANDS.value][self.operation_mode][self.temperature]
+        return _value
+
     def save_dict(self):
         """Save modified dict to output json file."""
         now = datetime.now()
@@ -412,6 +430,9 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
                 self.swing_mode = comb.swingModes
             self.temperature = str(comb.temperature)
 
+            if self._get_dict_value() != '':
+                continue
+
             _do_skip = self._skip_learning(comb)
             if _do_skip.skip:
                 # must read the first temperature and then reuse the same for next combination
@@ -454,6 +475,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             _code = self.__broadlink_manager.learn_single_code()
             _previous_code = _code
             if not _code:
+                self._save_partial_dict()
                 raise click.exceptions.UsageError(f"No IR signal learnt for {_combination_str} command within timeout.")
 
             # swing modes must be saved because all temperature need to be listened
