@@ -199,17 +199,16 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGABRT, self._signal_handler)
 
-        if _system == 'linux' or _system == 'darwin':
+        if _system in ('linux', 'darwin'):
             signal.signal(signal.SIGTERM, self._signal_handler)
         if _system == 'windows':
-            signal.signal(signal.SIGBREAK, self._signal_handler)
-            signal.signal(signal.CTRL_C_EVENT, self._signal_handler)
-            signal.signal(signal.CTRL_BREAK_EVENT, self._signal_handler)
+            signal.signal(signal.SIGBREAK, self._signal_handler)  # pylint: disable=no-member
+            signal.signal(signal.CTRL_C_EVENT, self._signal_handler)  # pylint: disable=no-member
+            signal.signal(signal.CTRL_BREAK_EVENT, self._signal_handler)  # pylint: disable=no-member
 
     def _signal_handler(self, _signumber, _frame):
         self._save_partial_dict()
         sys.exit(2)
-
 
     def _setup_combinations(self):
         _variable_args = [self.__fan_modes, self.__swing_modes]
