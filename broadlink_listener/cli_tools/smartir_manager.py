@@ -422,6 +422,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         """
         _previous_code = None
         _previous_combination = None
+        _loaded_codes = False
         for comb in self.__all_combinations:  # pylint: disable=too-many-nested-blocks
             self.operation_mode = comb.operationModes
             if _DictKeys.FAN_MODES in comb._fields:
@@ -431,6 +432,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             self.temperature = str(comb.temperature)
 
             if self._get_dict_value() != '':
+                _loaded_codes = True
                 continue
 
             _do_skip = self._skip_learning(comb)
@@ -470,7 +472,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
                 f"\nLet's learn IR command of\n{_combination_str}\n"
                 "Prepare the remote so Broadlink can listen the above combination when 'Listening' message"
                 " is on screen...",
-                _manual_wait
+                _manual_wait or _loaded_codes
             )
             _code = self.__broadlink_manager.learn_single_code()
             _previous_code = _code
