@@ -10,6 +10,7 @@ import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Generator
 
 import pytest
 from click.testing import CliRunner
@@ -17,7 +18,7 @@ from click.testing import CliRunner
 
 def _remove_tmp_files():
     """Utility method to remove all tmp files."""
-    _previous = glob.glob(os.path.join(Path.cwd().joinpath("tests").joinpath("data"), f'*_tmp_*.json'))
+    _previous = glob.glob(os.path.join(Path.cwd().joinpath("tests").joinpath("data"), '*_tmp_*.json'))
     for _file in _previous:
         os.remove(_file)
 
@@ -63,10 +64,10 @@ def json_file_missing_min_temp() -> Path:
 
 
 @pytest.fixture
-def json_file_good_data_op_mode() -> Path:
+def json_file_good_data_op_mode() -> Generator:
     """Return json test file with good structure.
 
-    Returns:
+    Yields:
         json's path file
     """
     yield Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_mode.json")
@@ -74,10 +75,10 @@ def json_file_good_data_op_mode() -> Path:
 
 
 @pytest.fixture
-def json_file_good_data_op_fan_mode() -> Path:
+def json_file_good_data_op_fan_mode() -> Generator:
     """Return json test file with good structure.
 
-    Returns:
+    Yields:
         json's path file
     """
     yield Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_fan_mode.json")
@@ -85,10 +86,10 @@ def json_file_good_data_op_fan_mode() -> Path:
 
 
 @pytest.fixture
-def json_file_good_data_op_fan_swing_mode() -> Path:
+def json_file_good_data_op_fan_swing_mode() -> Generator:
     """Return json test file with good structure.
 
-    Returns:
+    Yields:
         json's path file
     """
     yield Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_fan_swing_mode.json")
@@ -96,14 +97,15 @@ def json_file_good_data_op_fan_swing_mode() -> Path:
 
 
 @pytest.fixture
-def json_file_good_data_op_swing_mode() -> Path:
+def json_file_good_data_op_swing_mode() -> Generator:
     """Return json test file with good structure.
 
-    Returns:
+    Yields:
         json's path file
     """
     yield Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_swing_mode.json")
     _remove_tmp_files()
+
 
 @pytest.fixture
 def json_file_partial_dict_op_fan_swing_mode() -> Path:

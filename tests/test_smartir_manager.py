@@ -456,9 +456,9 @@ class TestSmartIR:
             _a.learn_all()
             assert _expected_dict == _a.smartir_dict
 
-
-    def test_partial_op_fan_swing_mode(self, json_file_partial_dict_op_fan_swing_mode,
-                                       json_file_previous_partial_dict_op_fan_swing_mode):
+    def test_partial_op_fan_swing_mode(
+        self, json_file_partial_dict_op_fan_swing_mode, json_file_previous_partial_dict_op_fan_swing_mode
+    ):
         """Test dict generation, all fields.
 
         Arguments:
@@ -469,7 +469,6 @@ class TestSmartIR:
         _expected_dict = dict_from_json(json_file_previous_partial_dict_op_fan_swing_mode)
         _source_dict = dict_from_json(json_file_partial_dict_op_fan_swing_mode)
 
-        _expect_dict_before_learn = dict(_expected_dict)
         _expected_dict.update({'off': _source_dict['commands']['off']})
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
@@ -497,10 +496,9 @@ class TestSmartIR:
             assert _a.smartir_dict['commands'] == _expected_dict
             assert _a.partial_inc == 3
 
-
-
-    def test_partial_op_swing_mode_multiple_files(self, json_file_partial_dict_op_swing_mode,
-                                                  json_file_last_previous_partial_dict_op_swing_mode):
+    def test_partial_op_swing_mode_multiple_files(
+        self, json_file_partial_dict_op_swing_mode, json_file_last_previous_partial_dict_op_swing_mode
+    ):
         """Test dict generation, all fields.
 
         Arguments:
@@ -511,7 +509,6 @@ class TestSmartIR:
         _expected_dict = dict_from_json(json_file_last_previous_partial_dict_op_swing_mode)
         _source_dict = dict_from_json(json_file_partial_dict_op_swing_mode)
 
-        _expect_dict_before_learn = dict(_expected_dict)
         _expected_dict.update({'off': _source_dict['commands']['off']})
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
@@ -538,7 +535,6 @@ class TestSmartIR:
             )
             assert _a.smartir_dict['commands'] == _expected_dict
             assert _a.partial_inc == 3
-
 
     def test_skip_temp(self, json_file_good_data_op_fan_swing_mode):
         """Test dict generation, all fields.

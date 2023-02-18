@@ -109,7 +109,6 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         self.__broadlink_manager = broadlink_mng
 
         self.__partial_inc = 0
-        self.__json_file_name = file_name
         self.__json_file_name_path = Path(file_name)
         with open(str(file_name), "r", encoding='utf-8') as in_file:
             self.__smartir_dict = json.load(in_file)
@@ -317,6 +316,11 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
 
     @property
     def partial_inc(self) -> int:
+        """Partial increment value.
+
+        Returns:
+            int: last index of saved partial json files
+        """
         return self.__partial_inc
 
     def _set_dict_value(self, value: str) -> None:
@@ -341,7 +345,9 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         _value = ''
         if _DictKeys.FAN_MODES in self.__combination_arguments:
             if _DictKeys.SWING_MODES in self.__combination_arguments:
-                _value = self.__smartir_dict[_DictKeys.COMMANDS.value][self.operation_mode][self.fan_mode][self.swing_mode][self.temperature]
+                _value = self.__smartir_dict[_DictKeys.COMMANDS.value][self.operation_mode][self.fan_mode][
+                    self.swing_mode
+                ][self.temperature]
             else:
                 _value = self.__smartir_dict[_DictKeys.COMMANDS.value][self.operation_mode][self.fan_mode][
                     self.temperature
@@ -365,12 +371,13 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             json.dump(self.__smartir_dict, out_file)
         click.echo(f"Created new file {_modified_file_name}")
         _previous = glob.glob(
-            os.path.join(self.__json_file_name_path.parent, f'{self.__json_file_name_path.stem}_tmp_*.json'))
+            os.path.join(self.__json_file_name_path.parent, f'{self.__json_file_name_path.stem}_tmp_*.json')
+        )
         for _file in _previous:
             os.remove(_file)
 
     def _save_partial_dict(self):
-         # save with incremental 3 numbers to sort correctly when load
+        # save with incremental 3 numbers to sort correctly when load
         _modified_file_name = self.__json_file_name_path.parent.joinpath(
             f'{self.__json_file_name_path.stem}_tmp_{self.__partial_inc:03}.json'
         )
@@ -386,14 +393,16 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             self.__partial_inc += 1
 
     def _load_partial_dict(self):
-        _previous = glob.glob(os.path.join(self.__json_file_name_path.parent, f'{self.__json_file_name_path.stem}_tmp_*.json'))
+        _previous = glob.glob(
+            os.path.join(self.__json_file_name_path.parent, f'{self.__json_file_name_path.stem}_tmp_*.json')
+        )
         _previous.sort()
         try:
             # load last file that's the most updated
             _last_file = _previous[-1]
             with open(str(_last_file), "r", encoding='utf-8') as partial_file:
                 self.__smartir_dict[_DictKeys.COMMANDS.value].update(json.load(partial_file))
-            _pattern = re.compile(f'{self.__json_file_name_path.stem}_tmp_(\d+).json')
+            _pattern = re.compile(fr'{self.__json_file_name_path.stem}_tmp_(\d+).json')
             _res = _pattern.search(_last_file)
             self.__partial_inc = int(_res.group(1))
         except IndexError:
@@ -407,7 +416,8 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         """
         _countdown(
             "First of all, let's learn OFF command: turn ON the remote and then turn it OFF when "
-            "'Listening' message is on screen...", False
+            "'Listening' message is on screen...",
+            False,
         )
         _off = self.__broadlink_manager.learn_single_code()
         if not _off:
@@ -421,7 +431,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             UsageError: if no IR signal is learnt within timeout
         """
         _previous_code = None
-        _previous_combination = None
+        _previous_combination: Optional[tuple] = None
         _loaded_codes = False
         for comb in self.__all_combinations:  # pylint: disable=too-many-nested-blocks
             self.operation_mode = comb.operationModes
@@ -460,19 +470,18 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
 
             _manual_wait = False
             if _previous_combination:
-                for i in range(0, len(comb)-1):
-                    if _previous_combination[i] != comb[i]:
+                for i in range(0, len(comb) - 1):
+                    if _previous_combination[i] != comb[i]:  # pylint: disable=unsubscriptable-object
                         _manual_wait = True
                         self._save_partial_dict()
             _previous_combination = comb
 
             _combination_str = self._get_combination(comb)
             _countdown(
-                "-" * 30 +
-                f"\nLet's learn IR command of\n{_combination_str}\n"
+                "-" * 30 + f"\nLet's learn IR command of\n{_combination_str}\n"
                 "Prepare the remote so Broadlink can listen the above combination when 'Listening' message"
                 " is on screen...",
-                _manual_wait or _loaded_codes
+                _manual_wait or _loaded_codes,
             )
             _code = self.__broadlink_manager.learn_single_code()
             _previous_code = _code
