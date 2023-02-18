@@ -495,6 +495,7 @@ class TestSmartIR:
                 json_file_partial_dict_op_fan_swing_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
             )
             assert _a.smartir_dict['commands'] == _expected_dict
+            assert _a.partial_inc == 3
 
 
 
@@ -536,6 +537,7 @@ class TestSmartIR:
                 json_file_partial_dict_op_swing_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
             )
             assert _a.smartir_dict['commands'] == _expected_dict
+            assert _a.partial_inc == 3
 
 
     def test_skip_temp(self, json_file_good_data_op_fan_swing_mode):

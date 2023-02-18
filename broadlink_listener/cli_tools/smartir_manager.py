@@ -7,6 +7,7 @@
 import glob
 import json
 import os
+import re
 from collections import namedtuple
 from copy import deepcopy
 from dataclasses import dataclass
@@ -109,6 +110,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
 
         self.__partial_inc = 0
         self.__json_file_name = file_name
+        self.__json_file_name_path = Path(file_name)
         with open(str(file_name), "r", encoding='utf-8') as in_file:
             self.__smartir_dict = json.load(in_file)
 
@@ -313,6 +315,10 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         """
         self.__swing_mode = new_value
 
+    @property
+    def partial_inc(self) -> int:
+        return self.__partial_inc
+
     def _set_dict_value(self, value: str) -> None:
         if _DictKeys.FAN_MODES in self.__combination_arguments:
             if _DictKeys.SWING_MODES in self.__combination_arguments:
@@ -334,21 +340,21 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
     def save_dict(self):
         """Save modified dict to output json file."""
         now = datetime.now()
-        _modified_file_name = Path(self.__json_file_name.parent).joinpath(
-            f'{self.__json_file_name.stem}_{now.strftime("%Y%m%d_%H%M%S")}.json'
+        _modified_file_name = self.__json_file_name_path.parent.joinpath(
+            f'{self.__json_file_name_path.stem}_{now.strftime("%Y%m%d_%H%M%S")}.json'
         )
         with open(_modified_file_name, 'w', encoding='utf-8') as out_file:
             json.dump(self.__smartir_dict, out_file)
         click.echo(f"Created new file {_modified_file_name}")
         _previous = glob.glob(
-            os.path.join(Path(self.__json_file_name.parent), f'{self.__json_file_name.stem}_tmp_*.json'))
+            os.path.join(self.__json_file_name_path.parent, f'{self.__json_file_name_path.stem}_tmp_*.json'))
         for _file in _previous:
             os.remove(_file)
 
     def _save_partial_dict(self):
          # save with incremental 3 numbers to sort correctly when load
-        _modified_file_name = Path(self.__json_file_name.parent).joinpath(
-            f'{self.__json_file_name.stem}_tmp_{self.__partial_inc:03}.json'
+        _modified_file_name = self.__json_file_name_path.parent.joinpath(
+            f'{self.__json_file_name_path.stem}_tmp_{self.__partial_inc:03}.json'
         )
 
         try:
@@ -362,12 +368,16 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             self.__partial_inc += 1
 
     def _load_partial_dict(self):
-        _previous = glob.glob(os.path.join(self.__json_file_name.parent, f'{self.__json_file_name.stem}_tmp_*.json'))
+        _previous = glob.glob(os.path.join(self.__json_file_name_path.parent, f'{self.__json_file_name_path.stem}_tmp_*.json'))
         _previous.sort()
         try:
             # load last file that's the most updated
-            with open(str(_previous[-1]), "r", encoding='utf-8') as partial_file:
+            _last_file = _previous[-1]
+            with open(str(_last_file), "r", encoding='utf-8') as partial_file:
                 self.__smartir_dict[_DictKeys.COMMANDS.value].update(json.load(partial_file))
+            _pattern = re.compile(f'{self.__json_file_name_path.stem}_tmp_(\d+).json')
+            _res = _pattern.search(_last_file)
+            self.__partial_inc = int(_res.group(1))
         except IndexError:
             pass
 
