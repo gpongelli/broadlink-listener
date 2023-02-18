@@ -7,7 +7,10 @@
 import glob
 import json
 import os
+import platform
 import re
+import signal
+import sys
 from collections import namedtuple
 from copy import deepcopy
 from dataclasses import dataclass
@@ -180,6 +183,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             self.__operation_mode = ''
             self.__fan_mode = ''
             self.__swing_mode = ''
+        self._setup_signal_handler()
 
     @property
     def smartir_dict(self) -> dict:
@@ -189,6 +193,23 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             dict: smartir compatible dictionary with learnt codes.
         """
         return self.__smartir_dict
+
+    def _setup_signal_handler(self):
+        _system = platform.system().lower()
+        signal.signal(signal.SIGINT, self._signal_handler)
+        signal.signal(signal.SIGABRT, self._signal_handler)
+
+        if _system == 'linux' or _system == 'darwin':
+            signal.signal(signal.SIGTERM, self._signal_handler)
+        if _system == 'windows':
+            signal.signal(signal.SIGBREAK, self._signal_handler)
+            signal.signal(signal.CTRL_C_EVENT, self._signal_handler)
+            signal.signal(signal.CTRL_BREAK_EVENT, self._signal_handler)
+
+    def _signal_handler(self, _signumber, _frame):
+        self._save_partial_dict()
+        sys.exit(2)
+
 
     def _setup_combinations(self):
         _variable_args = [self.__fan_modes, self.__swing_modes]
@@ -420,8 +441,8 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         """
         self.__prompt_event.clear()
         _countdown(
-            "First of all, let's learn OFF command: turn ON the remote and then turn it OFF when "
-            "'Listening' message is on screen...",
+            "First of all, let's learn OFF command:\nturn ON the remote and then turn it OFF when "
+            "'Listening' message is on screen, or interrupt with CTRL-C...",
             self.__prompt_event,
         )
         # set event to wait for first code
@@ -485,7 +506,7 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             _countdown(
                 "-" * 30 + f"\nLet's learn IR command of\n{_combination_str}\n"
                 "Prepare the remote so Broadlink can listen the above combination when 'Listening' message"
-                " is on screen...",
+                " is on screen, or interrupt with CTRL-C...",
                 self.__prompt_event,
             )
             _code = self.__broadlink_manager.learn_single_code()
