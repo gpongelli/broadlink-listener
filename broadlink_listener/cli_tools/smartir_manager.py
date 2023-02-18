@@ -340,6 +340,10 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
         with open(_modified_file_name, 'w', encoding='utf-8') as out_file:
             json.dump(self.__smartir_dict, out_file)
         click.echo(f"Created new file {_modified_file_name}")
+        _previous = glob.glob(
+            os.path.join(Path(self.__json_file_name.parent), f'{self.__json_file_name.stem}_tmp_*.json'))
+        for _file in _previous:
+            os.remove(_file)
 
     def _save_partial_dict(self):
          # save with incremental 3 numbers to sort correctly when load
