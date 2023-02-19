@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch
 
 import click
 import pytest
+from freezegun import freeze_time
 
 from broadlink_listener.cli_tools.smartir_manager import BroadlinkManager, SmartIrManager
 from tests.conftest import ExpectedValues, dict_from_json
@@ -850,3 +851,22 @@ class TestSmartIR:
             with pytest.raises(click.exceptions.UsageError):
                 _a = SmartIrManager(json_file_good_data_op_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678'))
                 _a.learn_off()
+
+    @freeze_time("2023-02-10 12:10:30")
+    def test_handle_signal(self, json_file_good_data_op_fan_swing_mode, capsys):
+        """Test handle keyboard interrupt.
+
+        Arguments:
+            json_file_good_data_op_fan_swing_mode: json file
+            capsys: pytest mock to capture stdout
+        """
+        with patch('broadlink.remote.rmmini.enter_learning'), patch(
+            'broadlink.device.Device.auth', Mock(return_value=True)
+        ), patch('time.sleep'), patch('builtins.input'):
+            _a = SmartIrManager(
+                json_file_good_data_op_fan_swing_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
+            )
+            _a.save_dict()
+
+            captured = capsys.readouterr()
+            assert 'good_data_op_fan_swing_mode_20230210_121030.json' in captured.out
