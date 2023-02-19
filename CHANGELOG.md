@@ -1,3 +1,22 @@
+## 1.1.0 (2023-02-20)
+
+### Feat
+
+- new test for json generation, remove temp files
+- new test for dict saving
+- handle signals, saving partial dict.
+- use event instead of bool to prompt waiting user
+- save partial dict when nothing listened, skip combination if previously saved
+- extract partial_inc from file saved, input filename as path in init
+- remove tmp file when saving final dict
+- load partial file plus tests
+- save partial dictionary listened
+- wait user input after a set of code listened, save to json that will be loaded on nex run to skip already read combinations
+
+### Fix
+
+- wait before first code if codes were loaded from previous file
+
 ## 1.0.0 (2022-12-18)
 
 ### Feat
