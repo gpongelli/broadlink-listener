@@ -64,6 +64,7 @@
             types-termcolor = "^1.1.5"
             types-setuptools = "^65.3.0"
             reuse = "^1.1.0"
+            freezegun = "^1.2.2"
 
 
     [tool.poetry.scripts]

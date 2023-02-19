@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch
 
 import click
 import pytest
+from freezegun import freeze_time
 
 from broadlink_listener.cli_tools.smartir_manager import BroadlinkManager, SmartIrManager
 from tests.conftest import ExpectedValues, dict_from_json
@@ -102,7 +103,7 @@ class TestSmartIR:
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
             'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('time.sleep'), patch(
+        ), patch('time.sleep'), patch('builtins.input'), patch(
             'broadlink.remote.rmmini.check_data',
             Mock(
                 side_effect=cycle(
@@ -120,7 +121,7 @@ class TestSmartIR:
             _a = SmartIrManager(json_file_good_data_op_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678'))
             assert _expect_dict_before_learn == _a.smartir_dict
 
-            _a.lear_all()
+            _a.learn_all()
             assert _expected_dict == _a.smartir_dict
 
     def test_learning_op_fan_mode(self, json_file_good_data_op_fan_mode):
@@ -191,7 +192,7 @@ class TestSmartIR:
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
             'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('time.sleep'), patch(
+        ), patch('time.sleep'), patch('builtins.input'), patch(
             'broadlink.remote.rmmini.check_data',
             Mock(
                 side_effect=cycle(
@@ -211,7 +212,7 @@ class TestSmartIR:
             _a = SmartIrManager(json_file_good_data_op_fan_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678'))
             assert _expect_dict_before_learn == _a.smartir_dict
 
-            _a.lear_all()
+            _a.learn_all()
             assert _expected_dict == _a.smartir_dict
 
     def test_learning_op_swing_mode(self, json_file_good_data_op_swing_mode):
@@ -282,7 +283,7 @@ class TestSmartIR:
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
             'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('time.sleep'), patch(
+        ), patch('time.sleep'), patch('builtins.input'), patch(
             'broadlink.remote.rmmini.check_data',
             Mock(
                 side_effect=cycle(
@@ -304,7 +305,7 @@ class TestSmartIR:
             )
             assert _expect_dict_before_learn == _a.smartir_dict
 
-            _a.lear_all()
+            _a.learn_all()
             assert _expected_dict == _a.smartir_dict
 
     def test_learning_op_fan_swing_mode(self, json_file_good_data_op_fan_swing_mode):
@@ -431,7 +432,7 @@ class TestSmartIR:
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
             'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('time.sleep'), patch(
+        ), patch('time.sleep'), patch('builtins.input'), patch(
             'broadlink.remote.rmmini.check_data',
             Mock(
                 side_effect=cycle(
@@ -453,8 +454,88 @@ class TestSmartIR:
             )
             assert _expect_dict_before_learn == _a.smartir_dict
 
-            _a.lear_all()
+            _a.learn_all()
             assert _expected_dict == _a.smartir_dict
+
+    def test_partial_op_fan_swing_mode(
+        self, json_file_partial_dict_op_fan_swing_mode, json_file_previous_partial_dict_op_fan_swing_mode
+    ):
+        """Test dict generation, all fields.
+
+        Arguments:
+            json_file_partial_dict_op_fan_swing_mode: json file
+            json_file_previous_partial_dict_op_fan_swing_mode: json file with partial IR saved
+        """
+        _expected_values = ExpectedValues()
+        _expected_dict = dict_from_json(json_file_previous_partial_dict_op_fan_swing_mode)
+        _source_dict = dict_from_json(json_file_partial_dict_op_fan_swing_mode)
+
+        _expected_dict.update({'off': _source_dict['commands']['off']})
+
+        with patch('broadlink.remote.rmmini.enter_learning'), patch(
+            'broadlink.device.Device.auth', Mock(return_value=True)
+        ), patch('time.sleep'), patch('builtins.input'), patch(
+            'broadlink.remote.rmmini.check_data',
+            Mock(
+                side_effect=cycle(
+                    [
+                        _expected_values.code_inc,
+                        _expected_values.code_dec,
+                        _expected_values.code_odd,
+                        _expected_values.code_even,
+                        _expected_values.code_lower,
+                        _expected_values.code_upper,
+                        _expected_values.code_last,
+                        _expected_values.code_last_lower,
+                    ]
+                )
+            ),
+        ):
+            _a = SmartIrManager(
+                json_file_partial_dict_op_fan_swing_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
+            )
+            assert _a.smartir_dict['commands'] == _expected_dict
+            assert _a.partial_inc == 3
+
+    def test_partial_op_swing_mode_multiple_files(
+        self, json_file_partial_dict_op_swing_mode, json_file_last_previous_partial_dict_op_swing_mode
+    ):
+        """Test dict generation, all fields.
+
+        Arguments:
+            json_file_partial_dict_op_swing_mode: json file
+            json_file_last_previous_partial_dict_op_swing_mode: last json file with partial IR saved
+        """
+        _expected_values = ExpectedValues()
+        _expected_dict = dict_from_json(json_file_last_previous_partial_dict_op_swing_mode)
+        _source_dict = dict_from_json(json_file_partial_dict_op_swing_mode)
+
+        _expected_dict.update({'off': _source_dict['commands']['off']})
+
+        with patch('broadlink.remote.rmmini.enter_learning'), patch(
+            'broadlink.device.Device.auth', Mock(return_value=True)
+        ), patch('time.sleep'), patch('builtins.input'), patch(
+            'broadlink.remote.rmmini.check_data',
+            Mock(
+                side_effect=cycle(
+                    [
+                        _expected_values.code_inc,
+                        _expected_values.code_dec,
+                        _expected_values.code_odd,
+                        _expected_values.code_even,
+                        _expected_values.code_lower,
+                        _expected_values.code_upper,
+                        _expected_values.code_last,
+                        _expected_values.code_last_lower,
+                    ]
+                )
+            ),
+        ):
+            _a = SmartIrManager(
+                json_file_partial_dict_op_swing_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
+            )
+            assert _a.smartir_dict['commands'] == _expected_dict
+            assert _a.partial_inc == 3
 
     def test_skip_temp(self, json_file_good_data_op_fan_swing_mode):
         """Test dict generation, all fields.
@@ -523,7 +604,7 @@ class TestSmartIR:
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
             'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('time.sleep'), patch(
+        ), patch('time.sleep'), patch('builtins.input'), patch(
             'broadlink.remote.rmmini.check_data',
             Mock(
                 side_effect=cycle(
@@ -544,7 +625,7 @@ class TestSmartIR:
                 json_file_good_data_op_fan_swing_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678'), ('heat',)
             )
 
-            _a.lear_all()
+            _a.learn_all()
             assert _expected_dict == _a.smartir_dict
 
     def test_skip_swing(self, json_file_good_data_op_fan_swing_mode):
@@ -614,7 +695,7 @@ class TestSmartIR:
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
             'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('time.sleep'), patch(
+        ), patch('time.sleep'), patch('builtins.input'), patch(
             'broadlink.remote.rmmini.check_data',
             Mock(
                 side_effect=cycle(
@@ -638,7 +719,7 @@ class TestSmartIR:
                 ('heat',),
             )
 
-            _a.lear_all()
+            _a.learn_all()
             assert _expected_dict == _a.smartir_dict
 
     def test_skip_swing_no_fan_mode(self, json_file_good_data_op_swing_mode):
@@ -680,7 +761,7 @@ class TestSmartIR:
 
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
             'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('time.sleep'), patch(
+        ), patch('time.sleep'), patch('builtins.input'), patch(
             'broadlink.remote.rmmini.check_data',
             Mock(
                 side_effect=cycle(
@@ -704,7 +785,7 @@ class TestSmartIR:
                 ('heat',),
             )
 
-            _a.lear_all()
+            _a.learn_all()
             assert _expected_dict == _a.smartir_dict
 
     def test_skip_swing_cli_param(self, json_file_good_data_op_fan_mode):
@@ -760,13 +841,32 @@ class TestSmartIR:
         """
         with patch('broadlink.remote.rmmini.enter_learning'), patch(
             'broadlink.device.Device.auth', Mock(return_value=True)
-        ), patch('time.sleep'), patch(
+        ), patch('time.sleep'), patch('builtins.input'), patch(
             'broadlink_listener.cli_tools.broadlink_manager.BroadlinkManager.learn_single_code', Mock(return_value=None)
         ):
             with pytest.raises(click.exceptions.UsageError):
                 _a = SmartIrManager(json_file_good_data_op_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678'))
-                _a.lear_all()
+                _a.learn_all()
 
             with pytest.raises(click.exceptions.UsageError):
                 _a = SmartIrManager(json_file_good_data_op_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678'))
                 _a.learn_off()
+
+    @freeze_time("2023-02-10 12:10:30")
+    def test_handle_signal(self, json_file_good_data_op_fan_swing_mode, capsys):
+        """Test handle keyboard interrupt.
+
+        Arguments:
+            json_file_good_data_op_fan_swing_mode: json file
+            capsys: pytest mock to capture stdout
+        """
+        with patch('broadlink.remote.rmmini.enter_learning'), patch(
+            'broadlink.device.Device.auth', Mock(return_value=True)
+        ), patch('time.sleep'), patch('builtins.input'):
+            _a = SmartIrManager(
+                json_file_good_data_op_fan_swing_mode, BroadlinkManager('0x51DA', '192.168.1.1', '12345678')
+            )
+            _a.save_dict()
+
+            captured = capsys.readouterr()
+            assert 'good_data_op_fan_swing_mode_20230210_121030.json' in captured.out

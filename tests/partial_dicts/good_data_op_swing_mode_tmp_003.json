@@ -1,0 +1,26 @@
+{
+  "cool": {
+    "up": {
+      "18": "MTIzNDU2Nzg=",
+      "19": "ODc2NTQzMjE=",
+      "20": "MTM1NzkxMTEz"
+    },
+    "down": {
+      "18": "MDI0NjgxMDEy",
+      "19": "YWJjZGVmZw==",
+      "20": "QUJDREVGRw=="
+    }
+  },
+  "heat": {
+    "up": {
+      "18": "VFVWV1hZWg==",
+      "19": "dHV2d3h5eg==",
+      "20": "MTIzNDU2Nzg="
+    },
+    "down": {
+      "18": "",
+      "19": "",
+      "20": ""
+    }
+  }
+}
