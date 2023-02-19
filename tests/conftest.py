@@ -8,6 +8,7 @@ import binascii
 import glob
 import json
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Generator
@@ -16,11 +17,17 @@ import pytest
 from click.testing import CliRunner
 
 
-def _remove_tmp_files():
-    """Utility method to remove all tmp files."""
-    _previous = glob.glob(os.path.join(Path.cwd().joinpath("tests").joinpath("data"), '*_tmp_*.json'))
+def _remove_tmp_files(file_pattern=r"[a-zA-Z_]*_tmp[_\d]+.json"):
+    """Utility method to remove test generated files.
+
+    Arguments:
+        file_pattern: regex pattern for files to be removed.
+    """
+    _pattern = re.compile(file_pattern)
+    _previous = glob.glob(os.path.join(Path.cwd().joinpath("tests").joinpath("data"), '*'))
     for _file in _previous:
-        os.remove(_file)
+        if _pattern.match(os.path.basename(_file)):
+            os.remove(_file)
 
 
 @pytest.fixture
@@ -72,6 +79,7 @@ def json_file_good_data_op_mode() -> Generator:
     """
     yield Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_mode.json")
     _remove_tmp_files()
+    _remove_tmp_files(r"[a-zA-Z_]*_[\d]+_[\d]+.json")
 
 
 @pytest.fixture
@@ -83,6 +91,7 @@ def json_file_good_data_op_fan_mode() -> Generator:
     """
     yield Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_fan_mode.json")
     _remove_tmp_files()
+    _remove_tmp_files(r"[a-zA-Z_]*_[\d]+_[\d]+.json")
 
 
 @pytest.fixture
@@ -94,6 +103,7 @@ def json_file_good_data_op_fan_swing_mode() -> Generator:
     """
     yield Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_fan_swing_mode.json")
     _remove_tmp_files()
+    _remove_tmp_files(r"[a-zA-Z_]*_[\d]+_[\d]+.json")
 
 
 @pytest.fixture
@@ -105,6 +115,7 @@ def json_file_good_data_op_swing_mode() -> Generator:
     """
     yield Path.cwd().joinpath("tests").joinpath("data").joinpath("good_data_op_swing_mode.json")
     _remove_tmp_files()
+    _remove_tmp_files(r"[a-zA-Z_]*_[\d]+_[\d]+.json")
 
 
 @pytest.fixture
