@@ -23,8 +23,9 @@ jobs:
   test:
     # The type of runner that the job will run on
     strategy:
+      fail-fast: false
       matrix:
-        python-versions: [ "3.8", "3.9", "3.10", "3.11" ]
+        python-version: [ "3.8", "3.9", "3.10", "3.11" ]
         poetry-version: [ "1.3" ]
         # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
         os: [ubuntu-latest, windows-latest, macos-latest]  # dependency issues on macos-latest and windows-latest
@@ -60,7 +61,7 @@ jobs:
 
       - name: test with tox
         run:
-          poetry run tox --skip-pkg-install -e py${{ matrix.python-versions }}
+          poetry run tox --skip-pkg-install -e py${{ matrix.python-version }}
 
       - name: list files
         run: ls -l .
@@ -70,4 +71,4 @@ jobs:
       - uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
-          files: ./xml_coverage_py${{ matrix.python-versions }}.xml
+          files: ./xml_coverage_py${{ matrix.python-version }}.xml
