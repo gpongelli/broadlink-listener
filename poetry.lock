@@ -87,14 +87,6 @@ toml = ["toml"]
 yaml = ["PyYAML"]
 
 [[package]]
-name = "bashlex"
-version = "0.18"
-description = "Python parser for bash"
-category = "dev"
-optional = false
-python-versions = ">=2.7, !=3.0, !=3.1, !=3.2, !=3.3, !=3.4"
-
-[[package]]
 name = "beautifulsoup4"
 version = "4.11.2"
 description = "Screen-scraping library"
@@ -164,14 +156,6 @@ description = "Define boolean algebras, create and parse boolean expressions and
 category = "dev"
 optional = false
 python-versions = "*"
-
-[[package]]
-name = "bracex"
-version = "2.3.post1"
-description = "Bash style brace expander."
-category = "dev"
-optional = false
-python-versions = ">=3.7"
 
 [[package]]
 name = "broadlink"
@@ -260,31 +244,6 @@ python-versions = ">=3.7"
 [package.dependencies]
 pyyaml = "*"
 tomlkit = "*"
-
-[[package]]
-name = "cibuildwheel"
-version = "2.12.0"
-description = "Build Python wheels on CI with minimal configuration."
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-bashlex = "!=0.13"
-bracex = "*"
-certifi = "*"
-filelock = "*"
-packaging = ">=20.9"
-platformdirs = "*"
-tomli = {version = "*", markers = "python_version < \"3.11\""}
-typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.11\""}
-
-[package.extras]
-bin = ["click", "packaging (>=21.0)", "pip-tools", "pygithub", "pyyaml", "requests", "rich (>=9.6)"]
-dev = ["build", "click", "jinja2", "mypy (>=0.901)", "packaging (>=21.0)", "pip-tools", "pygithub", "pytest (>=6)", "pytest-timeout", "pytest-xdist", "pyyaml", "requests", "rich (>=9.6)", "tomli-w", "types-certifi", "types-click", "types-jinja2", "types-pyyaml", "types-requests", "types-toml"]
-docs = ["jinja2 (>=3.1.2)", "mkdocs (==1.3.1)", "mkdocs-include-markdown-plugin (==2.8.0)", "mkdocs-macros-plugin", "pymdown-extensions"]
-mypy = ["mypy (>=0.901)", "types-certifi", "types-click", "types-jinja2", "types-pyyaml", "types-requests", "types-toml"]
-test = ["build", "jinja2", "pytest (>=6)", "pytest-timeout", "pytest-xdist", "tomli-w"]
 
 [[package]]
 name = "click"
@@ -1656,7 +1615,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
         python-versions = ">=3.8.0,<4.0"
-content-hash = "f69edf989409eda85e3c2702dc3fab382880a19150d635e03a843c56ab823237"
+content-hash = "e2217982842bd4f994a60bc3c2b4ca843bf56a368e2c71bfeb168296d3e0efaa"
 
 [metadata.files]
 alabaster = [
@@ -1687,10 +1646,6 @@ bandit = [
     {file = "bandit-1.7.4-py3-none-any.whl", hash = "sha256:412d3f259dab4077d0e7f0c11f50f650cc7d10db905d98f6520a95a18049658a"},
     {file = "bandit-1.7.4.tar.gz", hash = "sha256:2d63a8c573417bae338962d4b9b06fbc6080f74ecd955a092849e1e65c717bd2"},
 ]
-bashlex = [
-    {file = "bashlex-0.18-py2.py3-none-any.whl", hash = "sha256:91d73a23a3e51711919c1c899083890cdecffc91d8c088942725ac13e9dcfffa"},
-    {file = "bashlex-0.18.tar.gz", hash = "sha256:5bb03a01c6d5676338c36fd1028009c8ad07e7d61d8a1ce3f513b7fff52796ee"},
-]
 beautifulsoup4 = [
     {file = "beautifulsoup4-4.11.2-py3-none-any.whl", hash = "sha256:0e79446b10b3ecb499c1556f7e228a53e64a2bfcebd455f370d8927cb5b59e39"},
     {file = "beautifulsoup4-4.11.2.tar.gz", hash = "sha256:bc4bdda6717de5a2987436fb8d72f45dc90dd856bdfd512a1314ce90349a0106"},
@@ -1720,10 +1675,6 @@ bleach = [
 boolean-py = [
     {file = "boolean.py-4.0-py3-none-any.whl", hash = "sha256:2876f2051d7d6394a531d82dc6eb407faa0b01a0a0b3083817ccd7323b8d96bd"},
     {file = "boolean.py-4.0.tar.gz", hash = "sha256:17b9a181630e43dde1851d42bef546d616d5d9b4480357514597e78b203d06e4"},
-]
-bracex = [
-    {file = "bracex-2.3.post1-py3-none-any.whl", hash = "sha256:351b7f20d56fb9ea91f9b9e9e7664db466eb234188c175fd943f8f755c807e73"},
-    {file = "bracex-2.3.post1.tar.gz", hash = "sha256:e7b23fc8b2cd06d3dec0692baabecb249dda94e06a617901ff03a6c56fd71693"},
 ]
 broadlink = [
     {file = "broadlink-0.18.3-py3-none-any.whl", hash = "sha256:bc43b53cb3377200bb832d870d19d575c48c9fd43e039e65480aa1ccb66e82c9"},
@@ -1821,10 +1772,6 @@ charset-normalizer = [
 check-python-versions = [
     {file = "check-python-versions-0.21.2.tar.gz", hash = "sha256:1ac40a6d8736779f4f1124c9761541c603583ffce53a3caf3b8f4a74a0758892"},
     {file = "check_python_versions-0.21.2-py2.py3-none-any.whl", hash = "sha256:37fa8e3e866513482bb3e3a0eb6011b97a915360c0b323ca12368f604b948b4c"},
-]
-cibuildwheel = [
-    {file = "cibuildwheel-2.12.0-py3-none-any.whl", hash = "sha256:3d75d58f8e9909f2c9fe4923d03682e9ae27a45d38deba2a76b757114bdcf361"},
-    {file = "cibuildwheel-2.12.0.tar.gz", hash = "sha256:510b13a5cc8d854a82c1a6fa819c874b1f6a3064b90e31fda7b7a649bc8e80af"},
 ]
 click = [
     {file = "click-8.1.3-py3-none-any.whl", hash = "sha256:bb4d8133cb15a609f44e8213d9b391b0809795062913b383c62be0ee95b1db48"},

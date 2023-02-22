@@ -65,7 +65,6 @@
             types-setuptools = "^65.3.0"
             reuse = "^1.1.0"
             freezegun = "^1.2.2"
-            cibuildwheel = "^2.12.0"
             check-python-versions = "^0.21.2"
             python-active-versions = "^1.5.0"
 
@@ -184,45 +183,3 @@ max-line-length=120
 [build-system]
     requires = ["poetry-core>=1.0.0"]
     build-backend = "poetry.core.masonry.api"
-
-# locally can be run with 'poetry run cibuildwheel --platform ...'
-[tool.cibuildwheel]
-    build-frontend = "pip"
-    build-verbosity = 3
-
-    before-test = "python -m pip install --upgrade pip"
-    test-requires = ["poetry", "tox", "pytest"]
-    test-command = [
-        # takes tox & pytest configs from setup.cfg
-        # change to project dir where pyproject.toml exists
-        "cd {project}",
-        'poetry run tox --skip-pkg-install -e py3.11'
-    ]
-
-    # Skip CPython 3.6 and CPython 3.7 , Disable building PyPy wheels on all platforms
-    skip = ["cp36-*", "cp37-*", "pp*", "*musllinux*", "*aarch*", "*ppc*", "*s390*"]
-    build = ["cp38-*", "cp39-*", "cp310-*", "cp311-*"]
-
-    # configure cibuildwheel to build native archs ('auto'), and some emulated ones
-    # https://cibuildwheel.readthedocs.io/en/stable/faq/#emulation
-    # https://cibuildwheel.readthedocs.io/en/stable/options/#build-skip
-    # https://github.com/pypa/cibuildwheel/blob/main/examples/github-with-qemu.yml
-    [tool.cibuildwheel.windows]
-        archs = ["AMD64"]
-    [tool.cibuildwheel.macos]
-        archs = ["x86_64"]
-    [tool.cibuildwheel.linux]
-        # i686 arch needs cryptography to be manually built
-        # https://github.com/pyca/cryptography/blob/main/docs/installation.rst
-        archs = ["x86_64"]
-        # Build using the manylinux2014 image -> AlmaLinux 8 based
-        manylinux-x86_64-image = "manylinux_2_28"
-        manylinux-i686-image = "manylinux_2_28"
-        manylinux-aarch64-image = "manylinux_2_28"
-        repair-wheel-command = ""
-        # https://stackoverflow.com/questions/47968578/python3-utf-8-decode-issue
-        environment = { CRYPTOGRAPHY_DONT_BUILD_RUST="1", PYTHONIOENCODING="utf8" }
-        # skip musslinux build https://cibuildwheel.readthedocs.io/en/stable/options/#overrides
-        [[tool.cibuildwheel.overrides]]
-            select = "*-musllinux*"
-            skip = ["cp*", "pp*"]
