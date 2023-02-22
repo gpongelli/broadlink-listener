@@ -177,12 +177,12 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
 
         except KeyError as key_err:
             raise click.exceptions.UsageError(f"Missing mandatory field in json file: {key_err}") from None
-        else:
-            self._setup_combinations()
-            self.__temperature = ''
-            self.__operation_mode = ''
-            self.__fan_mode = ''
-            self.__swing_mode = ''
+
+        self._setup_combinations()
+        self.__temperature = ''
+        self.__operation_mode = ''
+        self.__fan_mode = ''
+        self.__swing_mode = ''
         self._setup_signal_handler()
 
     @property
@@ -411,10 +411,10 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             del _no_off['commands']['off']
         except KeyError:
             return
-        else:
-            with open(_modified_file_name, 'w', encoding='utf-8') as out_file:
-                json.dump(_no_off[_DictKeys.COMMANDS.value], out_file, indent=2)
-            self.__partial_inc += 1
+
+        with open(_modified_file_name, 'w', encoding='utf-8') as out_file:
+            json.dump(_no_off[_DictKeys.COMMANDS.value], out_file, indent=2)
+        self.__partial_inc += 1
 
     def _load_partial_dict(self):
         _previous = glob.glob(
