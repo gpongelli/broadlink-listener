@@ -203,7 +203,6 @@ class SmartIrManager:  # pylint: disable=too-many-instance-attributes
             signal.signal(signal.SIGTERM, self._signal_handler)
         if _system == 'windows':
             signal.signal(signal.SIGBREAK, self._signal_handler)  # pylint: disable=no-member
-            signal.signal(signal.CTRL_BREAK_EVENT, self._signal_handler)  # pylint: disable=no-member
 
     def _signal_handler(self, _signumber, _frame):
         self._save_partial_dict()
