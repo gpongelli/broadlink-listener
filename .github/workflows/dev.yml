@@ -57,7 +57,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip setuptools
           poetry install --with devel --sync
       #    pip install poetry tox tox-gh-actions
 
@@ -68,9 +68,21 @@ jobs:
         run:
           poetry run tox --skip-pkg-install -e lint
 
-      - name: test with tox
+      # https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context
+      - name: test with tox - Windows
+        if: runner.os == 'Windows'
         run:
-          poetry run tox --skip-pkg-install -e py${{ matrix.python-version }}
+          poetry run tox --skip-pkg-install -e py${{ matrix.python-version }}-win
+
+      - name: test with tox - Linux
+        if: runner.os == 'Linux'
+        run:
+          poetry run tox --skip-pkg-install -e py${{ matrix.python-version }}-lin
+
+      - name: test with tox - MacOS
+        if: runner.os == 'macOS'
+        run:
+          poetry run tox --skip-pkg-install -e py${{ matrix.python-version }}-mac
 
       - name: list files
         run: ls -l .
@@ -116,7 +128,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip setuptools
           poetry install --with devel --sync
 
       # Build and publish documentation
