@@ -94,7 +94,7 @@ jobs:
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./xml_coverage_py${{ matrix.python-version }}.xml
+          files: ./xml_coverage_py${{ matrix.python-version }}-mac.xml
 
   # This workflow contains a single job called "release"
   release:
