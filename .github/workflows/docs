@@ -28,7 +28,7 @@ jobs:
     # The type of runner that the job will run on
     strategy:
       matrix:
-        python-versions: [3.9]
+        python-version: [3.9]
         # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
         os: [ubuntu-20.04]  # dependency issues on macos-latest and windows-latest
     runs-on: ${{ matrix.os }}
@@ -45,7 +45,7 @@ jobs:
       # https://github.com/actions/setup-python
       - uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-versions }}
+          python-version: ${{ matrix.python-version }}
           cache: 'poetry'
 
       - name: Install dependencies

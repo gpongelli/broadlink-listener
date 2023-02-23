@@ -27,11 +27,12 @@ jobs:
   # This workflow contains a single job called "release"
   release:
     name: Create Release
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     strategy:
       matrix:
-        python-versions: [3.9]
+        python-version: [ "3.11" ]
+        poetry-version: [ "1.3" ]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -43,15 +44,15 @@ jobs:
         id: changelog
         uses: BinPar/read-conventional-commit-changelog@v2.0.2
 
-      # https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#caching-packages
-      - name: Install Poetry
-        run: pipx install poetry
-
       # https://github.com/actions/setup-python
       - uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-versions }}
-          cache: 'poetry'
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup Poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
 
       - name: Install dependencies
         run: |
@@ -63,7 +64,7 @@ jobs:
         uses: actions/configure-pages@v2
 
       - name: build documentation
-        run: poetry run tox -e docs
+        run: poetry run tox --skip-pkg-install -e docs
 
       - name: Upload doc artifact
         uses: actions/upload-pages-artifact@v1
