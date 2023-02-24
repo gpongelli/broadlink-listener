@@ -1,3 +1,21 @@
+## 1.2.0 (2023-02-24)
+
+### Feat
+
+- call different tox environment due to how OS call python binary
+- unify workflow, deactivating others
+- removed complete workflow, cibuildwheel does not build pure python package
+- add python-active-versions and check-python-versions
+
+
+### Fix
+
+- coverage file name
+- remove invalid signal CTRL_BREAK for windows
+- remove invalid signal value on windows
+- fallback to previous workflows, adding OS
+- remove unnecessary else after raise or return
+
 ## 1.1.0 (2023-02-20)
 
 ### Feat
